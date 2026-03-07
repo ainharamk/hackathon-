@@ -325,8 +325,8 @@ function App() {
    
 
 
-    
-    // Add otehr code above this line as below it is the UI and we want to keep a clean structure
+
+    // Add other code above this line as below it is the UI and we want to keep a clean structure
 
 
     // ---------- HOME ----------
