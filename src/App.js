@@ -92,11 +92,37 @@ function App() {
 
       </div>
     );
+  }
+    // ---------- DAILY RESULT ----------
+    const DailyResult = () => {
+      let message = "";
 
+      if (mood <= 2) {
+        message = "You seem a bit low today, why don't you reach out to someone.";
+      } 
+      else if (mood === 3) {
+        message = "Your mood is ok, do something to cheer yourself up.";
+      } 
+      else if (mood >= 4) {
+        message = "Good job, keep going!";
+      }
 
+      return (
+        <div className="container">
 
+          <h2>Daily Summary</h2>
 
-    }
+          <div className="alert">
+            {message}
+          </div>
+
+          <button className="main-btn" onClick={() => setPage("home")}>
+            Go Back Home
+          </button>
+
+        </div>
+      );
+    };
     
   }
   
