@@ -313,7 +313,7 @@ function App() {
     // ---------- HOME ----------
     return (
       <div className="container">
-        <h1 className="app-title">APP NAME</h1>
+        <h1 className="app-title">AFTER 9</h1>
       
 
         <div className="home-grid">
