@@ -309,7 +309,55 @@ function App() {
       );
     };
 
+
+    // ---------- HOME ----------
+    return (
+      <div className="container">
+        <h1 className="app-title">APP NAME</h1>
+      
+
+        <div className="home-grid">
+
+        <div
+          className="home-card home-card-large"
+          onClick={() => setPage("daily")}
+        >
+          Daily Tracker
+        </div>
+
+        <div
+          className="home-card"
+          onClick={() => setPage("weekly")}
+        >
+          Monthly Check-In
+        </div>
+
+        <div
+          className="home-card"
+          onClick={() => setPage("support")}
+        >
+          Support Groups
+        </div>
+
+        <div
+          className="home-card"
+          onClick={() => setPage("emergency")}
+        >
+          Emergency Contacts
+        </div>
+
+        <div
+          className="home-card"
+          onClick={() => setPage("info")}
+        >
+          Information & Awareness
+        </div>
+
+      </div>
+      </div>
+    );
     
+
   }
   
   export default App;
