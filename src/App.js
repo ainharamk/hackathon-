@@ -314,10 +314,8 @@ const SupportGroup = () => {
 
   const [view, setView] = useState("menu");
 
-  const [posts, setPosts] = useState(() => {
-    const saved = localStorage.getItem("supportPosts");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [posts, setPosts] = useState([]);
+  const [showReplies, setShowReplies] = useState({});
 
   const [newPost, setNewPost] = useState("");
   const [replyText, setReplyText] = useState({});
@@ -327,36 +325,66 @@ const SupportGroup = () => {
     localStorage.setItem("supportPosts", JSON.stringify(updatedPosts));
   };
 
-  const handlePostSubmit = () => {
+  useEffect(() => {
+    fetch("http://localhost:3001/forum/posts")
+      .then(res => res.json())
+      .then(data => setPosts(data));
+  }, []);
+
+
+  const handlePostSubmit = async () => {
+
     if (!newPost.trim()) return;
 
     const post = {
       id: Date.now(),
       content: newPost,
-      replies: [],
       createdByUser: true
+
     };
 
-    const updatedPosts = [post, ...posts];
-    savePosts(updatedPosts);
+    await fetch("http://localhost:3001/forum/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(post)
+    });
+
+    setPosts([ { ...post, replies: [] }, ...posts ]);
     setNewPost("");
+
   };
 
-  const handleReplySubmit = (postId) => {
-    if (!replyText[postId]?.trim()) return;
+  const handleReplySubmit = async (postId) => {
+
+    const text = replyText[postId];
+    if (!text?.trim()) return;
+
+    await fetch("http://localhost:3001/forum/replies", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        postId,
+        message: text
+      })
+    });
 
     const updatedPosts = posts.map(post => {
       if (post.id === postId) {
         return {
           ...post,
-          replies: [...post.replies, replyText[postId]]
+          replies: [...post.replies, text]
         };
       }
       return post;
     });
 
-    savePosts(updatedPosts);
+    setPosts(updatedPosts);
     setReplyText({ ...replyText, [postId]: "" });
+
   };
 
 
@@ -430,23 +458,54 @@ const SupportGroup = () => {
 
         {posts.length === 0 && <p>No chats available yet.</p>}
 
-        {posts.map(post => (
-          <div
-            key={post.id}
-            style={{
-              textAlign: "left",
-              marginBottom: "15px",
-              padding: "10px",
-              background: "#f5f3ff",
-              borderRadius: "8px"
-            }}
-          >
-            <p><strong>Anonymous:</strong> {post.content}</p>
-            <p style={{ fontSize: "12px", color: "gray" }}>
-              {post.replies.length} replies
-            </p>
-          </div>
-        ))}
+
+  {posts.map(post => (
+    <div key={post.id} className="post-box">
+
+      <p><strong>Anonymous:</strong> {post.content}</p>
+
+      <button
+        onClick={() =>
+          setShowReplies({
+            ...showReplies,
+            [post.id]: !showReplies[post.id]
+          })
+        }
+      >
+        Show Replies ({post.replies?.length || 0})
+      </button>
+
+      {showReplies[post.id] && (
+        <div style={{ marginTop: "10px" }}>
+
+          {post.replies?.map((r, i) => (
+            <p key={i}>↳ {r}</p>
+          ))}
+
+        </div>
+      )}
+
+      {/* DELETE BUTTON */}
+      <button
+        className="main-btn"
+        style={{ marginTop: "10px", background: "#f87171" }}
+        onClick={async () => {
+
+          await fetch(
+            `http://localhost:3001/forum/posts/${post.id}`,
+            { method: "DELETE" }
+          );
+
+          setPosts(posts.filter(p => p.id !== post.id));
+
+        }}
+      >
+        Delete Chat
+      </button>
+
+    </div>
+  ))}
+
 
         <button className="main-btn" onClick={() => setView("menu")}>
           Back
@@ -455,6 +514,52 @@ const SupportGroup = () => {
     );
   }
 
+  // ---------- YOUR CHATS ----------
+  if (view === "yourChats") {
+
+    const yourPosts = posts.filter(post => post.createdByUser);
+
+    return (
+      <div className="container">
+
+        <h2>Your Chats</h2>
+
+        {yourPosts.length === 0 && (
+          <p>You haven't created any chats yet.</p>
+        )}
+
+        {yourPosts.map(post => (
+          <div key={post.id} className="post-box">
+
+            <p>{post.content}</p>
+
+            <button
+              className="main-btn"
+              style={{ background: "#f87171", marginTop: "10px" }}
+              onClick={async () => {
+
+                await fetch(
+                  `http://localhost:3001/forum/posts/${post.id}`,
+                  { method: "DELETE" }
+                );
+
+                setPosts(posts.filter(p => p.id !== post.id));
+
+              }}
+            >
+              Delete Chat
+            </button>
+
+          </div>
+        ))}
+
+        <button className="main-btn" onClick={() => setView("new")}>
+          Back
+        </button>
+
+      </div>
+    );
+  }
    // ---------- ASK AN EXPERT ----------
   if (view === "expert") {
     return (
