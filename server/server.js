@@ -14,7 +14,7 @@ app.use(cors({
 // ---------- DATABASE CONNECTION ----------
 const db = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    port: Number(process.env.DB_PORT),
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -135,4 +135,6 @@ app.delete("/forum/posts/:id", (req, res) => {
 
 // ---------- SERVER ----------
 const PORT = process.env.PORT || 27275;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
