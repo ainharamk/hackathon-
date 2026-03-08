@@ -373,6 +373,40 @@ function App() {
       </div>
     );
   }
+    // ---------- EXISTING CHATS ----------
+  if (view === "existing") {
+    return (
+      <div className="container">
+        <h2>Existing Chats</h2>
+
+        {posts.length === 0 && <p>No chats available yet.</p>}
+
+        {posts.map(post => (
+          <div
+            key={post.id}
+            style={{
+              textAlign: "left",
+              marginBottom: "15px",
+              padding: "10px",
+              background: "#f5f3ff",
+              borderRadius: "8px"
+            }}
+          >
+            <p><strong>Anonymous:</strong> {post.content}</p>
+            <p style={{ fontSize: "12px", color: "gray" }}>
+              {post.replies.length} replies
+            </p>
+          </div>
+        ))}
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+    );
+  }
+
+
 
     // Add other code above this line as below it is the UI and we want to keep a clean structure
 
