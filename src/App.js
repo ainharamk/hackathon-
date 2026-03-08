@@ -483,6 +483,47 @@ const SupportGroup = () => {
   }
 }
 
+// ---------- EMERGENCY CONTACTS ----------
+const EmergencyContacts = () => (
+ <div className="container">
+
+ <h2>Emergency Contacts</h2>
+
+ <p>
+ This page provides immediate access to support services.
+ If you are feeling unsafe, overwhelmed, or experiencing thoughts
+ of self-harm, please use one of the options below.
+ </p>
+
+ <div className="vertical-options">
+
+ <button className="main-btn">
+ Call Emergency Contact
+ </button>
+
+ <button className="main-btn">
+ Call Postpartum Helpline
+ </button>
+
+ <button className="main-btn">
+ Request Health Visitor
+ </button>
+
+ <button className="main-btn">
+ Call Emergency Services
+ </button>
+
+ </div>
+
+
+
+ <button className="main-btn" onClick={() => setPage("home")}>
+ Back to Home
+ </button>
+
+ </div>
+);
+
 
 
     // Add other code above this line as below it is the UI and we want to keep a clean structure
