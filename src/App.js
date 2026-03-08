@@ -528,6 +528,99 @@ const EmergencyContacts = () => (
 
 
 
+
+// ---------- INFORMATION ----------
+const Information = () => {
+
+  const [view, setView] = useState("menu");
+
+    // ---------- MAIN ARTICLE MENU ----------
+      if (view === "menu") {
+        return (
+          <div className="container">
+            <h2>Information & Awareness</h2>
+
+            <p>
+              Explore educational articles about postpartum mental health,
+              symptoms, recovery, and real experiences.
+            </p>
+
+            <div className="article-grid">
+
+              <div className="article-card" onClick={() => setView("article1")}>
+                Article 1
+              </div>
+
+              <div className="article-card" onClick={() => setView("article2")}>
+                Article 2
+              </div>
+
+              <div className="article-card" onClick={() => setView("article3")}>
+                Article 3
+              </div>
+
+              <div className="article-card" onClick={() => setView("article4")}>
+                Article 4
+              </div>
+
+              <div className="article-card" onClick={() => setView("article5")}>
+                Article 5
+              </div>
+
+              <div className="article-card" onClick={() => setView("article6")}>
+                Article 6
+              </div>
+
+            </div>
+
+            <button className="main-btn" onClick={() => setPage("home")}>
+              Back to Home
+            </button>
+          </div>
+        );
+      }
+
+    // ---------- ARTICLE 1 ----------
+    if (view === "article1") {
+      return (
+        <div className="container">
+          <h2>About Postpartum Depression</h2>
+
+          <p>
+            Postpartum depression is a mood disorder that can occur after childbirth.
+            If untreated, it may progress into chronic major depressive disorder.
+          </p>
+
+          <h3>Common Symptoms</h3>
+          <ul>
+            <li>Persistent sadness</li>
+            <li>Loss of interest in activities</li>
+            <li>Sleep disturbance</li>
+            <li>Feelings of guilt or worthlessness</li>
+            <li>Difficulty bonding with baby</li>
+          </ul>
+
+          <button className="main-btn" onClick={() => setView("menu")}>
+            Back
+          </button>
+        </div>
+      );
+    }
+
+
+
+
+
+};
+
+
+
+
+
+
+
+
+
     // Add other code above this line as below it is the UI and we want to keep a clean structure
 
 
