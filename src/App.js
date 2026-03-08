@@ -411,6 +411,23 @@ function App() {
     // Add other code above this line as below it is the UI and we want to keep a clean structure
 
 
+
+
+
+
+
+    // ---------- PAGE ROUTING ----------
+    if (page === "daily") return <DailyTracker />;
+    if (page === "dailyResult") return <DailyResult />;
+    if (page === "weekly") return <MonthlyCheckin />;
+    if (page === "support") return <SupportGroup />;
+    if (page === "emergency") return <EmergencyContacts />;
+    if (page === "info") return <Information />;
+
+
+
+
+
     // ---------- HOME ----------
     return (
       <div className="container">
