@@ -606,7 +606,42 @@ const Information = () => {
         </div>
       );
     }
+    // ---------- ARTICLE 2 ----------
+    if (view === "article2") 
+    {
+      return (
+      <div className="container">
+        <h2>Risk Factors</h2>
 
+        <p>
+          Factors such as lack of support, previous depression,
+          traumatic birth experience, or hormonal changes can increase risk.
+        </p>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+      );
+    }
+
+  // ---------- ARTICLE 3 ----------
+  if (view === "article3") {
+  return (
+    <div className="container">
+      <h2>Treatment & Recovery</h2>
+
+      <p>
+      Treatment may include therapy, medication, lifestyle adjustments,
+      and increased social support.
+      </p>
+
+      <button className="main-btn" onClick={() => setView("menu")}>
+      Back
+      </button>
+    </div>
+    );
+  }
 
 
 
