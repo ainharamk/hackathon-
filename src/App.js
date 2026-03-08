@@ -679,6 +679,24 @@ const Information = () => {
   );
   }
 
+  // ---------- ARTICLE 6 ----------
+  if (view === "article6") {
+    return (
+      <div className="container">
+        <h2>When to Seek Help</h2>
+
+        <p>
+          If symptoms last longer than two weeks, interfere with daily life,
+          or include thoughts of self-harm, professional support is strongly advised.
+        </p>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+    );
+  }
+
 
 
 
