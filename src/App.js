@@ -308,88 +308,88 @@ function App() {
         </div>
       );
     };
+  
+  // ---------- SUPPORT GROUP ----------
+const SupportGroup = () => {
 
-    // ---------- SUPPORT GROUP ----------
-    const SupportGroup = () => {
+  const [view, setView] = useState("menu");
 
-      const [view, setView] = useState("menu");
+  const [posts, setPosts] = useState(() => {
+    const saved = localStorage.getItem("supportPosts");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-      const [posts, setPosts] = useState(() => {
-        const saved = localStorage.getItem("supportPosts");
-        return saved ? JSON.parse(saved) : [];
-      });
+  const [newPost, setNewPost] = useState("");
+  const [replyText, setReplyText] = useState({});
 
-      const [newPost, setNewPost] = useState("");
-      const [replyText, setReplyText] = useState({});
+  const savePosts = (updatedPosts) => {
+    setPosts(updatedPosts);
+    localStorage.setItem("supportPosts", JSON.stringify(updatedPosts));
+  };
 
-      const savePosts = (updatedPosts) => {
-        setPosts(updatedPosts);
-        localStorage.setItem("supportPosts", JSON.stringify(updatedPosts));
-      };
+  const handlePostSubmit = () => {
+    if (!newPost.trim()) return;
 
-      const handlePostSubmit = () => {
-        if (!newPost.trim()) return;
+    const post = {
+      id: Date.now(),
+      content: newPost,
+      replies: [],
+      createdByUser: true
+    };
 
-        const post = {
-          id: Date.now(),
-          content: newPost,
-          replies: [],
-          createdByUser: true
+    const updatedPosts = [post, ...posts];
+    savePosts(updatedPosts);
+    setNewPost("");
+  };
+
+  const handleReplySubmit = (postId) => {
+    if (!replyText[postId]?.trim()) return;
+
+    const updatedPosts = posts.map(post => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          replies: [...post.replies, replyText[postId]]
         };
+      }
+      return post;
+    });
 
-        const updatedPosts = [post, ...posts];
-        savePosts(updatedPosts);
-        setNewPost("");
-      };
+    savePosts(updatedPosts);
+    setReplyText({ ...replyText, [postId]: "" });
+  };
 
-      const handleReplySubmit = (postId) => {
-        if (!replyText[postId]?.trim()) return;
 
-        const updatedPosts = posts.map(post => {
-          if (post.id === postId) {
-            return {
-              ...post,
-              replies: [...post.replies, replyText[postId]]
-            };
-          }
-          return post;
-        });
+  // ---------- MAIN MENU ----------
+  if (view === "menu") {
+    return (
+      <div className="container">
+        <h2>Support Groups</h2>
 
-        savePosts(updatedPosts);
-        setReplyText({ ...replyText, [postId]: "" });
-      };
+        <p>
+          Connect with other mothers, join conversations, or seek expert advice.
+        </p>
 
-    // ---------- MAIN MENU ----------
-    if (view === "menu") {
-      return (
-        <div className="container">
-          <h2>Support Groups</h2>
+        <div className="vertical-options">
+          <button className="main-btn" onClick={() => setView("new")}>
+            New Chat
+          </button>
 
-          <p>
-            Connect with other mothers, join conversations, or seek expert advice.
-          </p>
+          <button className="main-btn" onClick={() => setView("existing")}>
+            Existing Chats
+          </button>
 
-          <div className="vertical-options">
-            <button className="main-btn" onClick={() => setView("new")}>
-              New Chat
-            </button>
-
-            <button className="main-btn" onClick={() => setView("existing")}>
-              Existing Chats
-            </button>
-
-            <button className="main-btn" onClick={() => setView("expert")}>
-              Ask an Expert
-            </button>
-          </div>
-
-          <button className="main-btn" onClick={() => setPage("home")}>
-            Back to Home
+          <button className="main-btn" onClick={() => setView("expert")}>
+            Ask an Expert
           </button>
         </div>
-      );
-    }
-  
+
+        <button className="main-btn" onClick={() => setPage("home")}>
+          Back to Home
+        </button>
+      </div>
+    );
+  }
   // ---------- NEW CHAT ----------
   if (view === "new") {
     return (
@@ -422,46 +422,6 @@ function App() {
       </div>
     );
   }
-  // ---------- YOUR CHATS ----------
-  if (view === "yourChats") {
-    const userChats = posts.filter(post => post.createdByUser);
-
-    return (
-      <div className="container">
-        <h2>Your Chats</h2>
-
-        {userChats.length === 0 && (
-          <p>You haven't created any chats yet.</p>
-        )}
-
-        {userChats.map(post => (
-          <div
-            key={post.id}
-            style={{
-              textAlign: "left",
-              marginBottom: "20px",
-              padding: "10px",
-              background: "#f5f3ff",
-              borderRadius: "8px"
-            }}
-          >
-            <p><strong>You:</strong> {post.content}</p>
-
-            {post.replies.map((reply, index) => (
-              <p key={index} style={{ marginLeft: "15px" }}>
-                ↳ {reply}
-              </p>
-            ))}
-          </div>
-        ))}
-
-        <button className="main-btn" onClick={() => setView("new")}>
-          Back
-        </button>
-      </div>
-    );
-  }
-
     // ---------- EXISTING CHATS ----------
   if (view === "existing") {
     return (
@@ -494,7 +454,8 @@ function App() {
       </div>
     );
   }
-    // ---------- ASK AN EXPERT ----------
+
+   // ---------- ASK AN EXPERT ----------
   if (view === "expert") {
     return (
       <div className="container">
@@ -520,11 +481,6 @@ function App() {
       </div>
     );
   }
-};
-
-
-
-
 }
 
 
@@ -596,8 +552,8 @@ function App() {
       </div>
     );
     
-
-
+  
+}
   
   export default App;
 
