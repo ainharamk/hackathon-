@@ -2,20 +2,113 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
+
+  const [user, setUser] = useState(() => localStorage.getItem("currentUser") || null);
+  const [inputName, setInputName] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [authMode, setAuthMode] = useState("login");
+
   const [page, setPage] = useState("home");
   const [mood, setMood] = useState(null);
   const [sleep, setSleep] = useState(null);
   const [weeklyScore, setWeeklyScore] = useState(null);
   const [lastLog, setLastLog] = useState(null);
 
-    // Load last saved log on app start
-    useEffect(() => {
-      const saved = localStorage.getItem("dailyLog");
-      if (saved) {
-        setLastLog(JSON.parse(saved));
+  const handleLogin = () => {
+    const name = inputName.trim();
+    const pass = inputPassword.trim();
+    if (!name || !pass) {
+      setLoginError("Please enter both a username and password.");
+      return;
+    }
+    const storedPassword = localStorage.getItem(`${name}_password`);
+
+    if (authMode === "register") {
+      if (storedPassword) {
+        setLoginError("That username is already taken. Please log in.");
+        return;
       }
-    }, []);
-  
+      localStorage.setItem(`${name}_password`, pass);
+      localStorage.setItem("currentUser", name);
+      setUser(name);
+    } else {
+      if (!storedPassword) {
+        setLoginError("No account found. Please register first.");
+        return;
+      }
+      if (storedPassword !== pass) {
+        setLoginError("Incorrect password.");
+        return;
+      }
+      localStorage.setItem("currentUser", name);
+      setUser(name);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setMood(null);
+    setSleep(null);
+    setLastLog(null);
+    setPage("home");
+    setUser(null);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    setLastLog(null);
+    const saved = localStorage.getItem(`${user}_dailyLog`);
+    if (saved) {
+      setLastLog(JSON.parse(saved));
+    }
+  }, [user]);
+
+  if (!user) {
+    return (
+      <div className="container">
+        <h1 className="app-title">AFTER 9</h1>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
+          <button
+            className="main-btn"
+            style={{ opacity: authMode === "login" ? 1 : 0.4 }}
+            onClick={() => { setAuthMode("login"); setLoginError(""); }}
+          >
+            Login
+          </button>
+          <button
+            className="main-btn"
+            style={{ opacity: authMode === "register" ? 1 : 0.4 }}
+            onClick={() => { setAuthMode("register"); setLoginError(""); }}
+          >
+            Register
+          </button>
+        </div>
+
+        <p style={{ marginBottom: "5px" }}>Username</p>
+        <input
+          placeholder="Username..."
+          value={inputName}
+          onChange={(e) => { setInputName(e.target.value); setLoginError(""); }}
+          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
+        />
+        <p style={{ marginBottom: "5px" }}>Password</p>
+        <input
+          type="password"
+          placeholder="Password..."
+          value={inputPassword}
+          onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }}
+          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
+        />
+        {loginError && <p style={{ color: "#991b1b", fontSize: "13px" }}>{loginError}</p>}
+        <button className="main-btn" onClick={handleLogin}>
+          {authMode === "login" ? "Login" : "Create Account"}
+        </button>
+      </div>
+    );
+  }
+
     // ---------- DAILY TRACKER ----------
     const DailyTracker = () => {
 
@@ -28,13 +121,13 @@ function App() {
           date: new Date().toLocaleDateString()
         };
       
-      localStorage.setItem("dailyLog", JSON.stringify(log));
+      localStorage.setItem(`${user}_dailyLog`, JSON.stringify(log));
       setLastLog(log);
 
       const key = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
-      const allLogs = JSON.parse(localStorage.getItem("allLogs") || "{}");
+      const allLogs = JSON.parse(localStorage.getItem(`${user}_allLogs`) || "{}");
       allLogs[key] = { mood, sleep };
-      localStorage.setItem("allLogs", JSON.stringify(allLogs));
+      localStorage.setItem(`${user}_allLogs`, JSON.stringify(allLogs));
 
       setPage("dailyResult");
 
@@ -108,7 +201,7 @@ function App() {
       const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
       const logs = (() => {
-        const saved = localStorage.getItem("allLogs");
+        const saved = localStorage.getItem(`${user}_allLogs`);
         return saved ? JSON.parse(saved) : {};
       })();
 
@@ -475,8 +568,8 @@ function App() {
         {
           question: "6. Things have been getting on top of me:",
           options: [
-            "Yes, most of the time I haven’t been able to cope at all",
-            "Yes, sometimes I haven’t been coping as well as usual",
+            "Yes, most of the time I haven't been able to cope at all",
+            "Yes, sometimes I haven't been coping as well as usual",
             "No, most of the time I have coped quite well",
             "No, I have been coping as well as ever"
           ]
@@ -623,7 +716,7 @@ const SupportGroup = () => {
 
   const savePosts = (updatedPosts) => {
     setPosts(updatedPosts);
-    localStorage.setItem("supportPosts", JSON.stringify(updatedPosts));
+    localStorage.setItem(`${user}_supportPosts`, JSON.stringify(updatedPosts));
   };
 
   useEffect(() => {
@@ -1140,7 +1233,7 @@ const Information = () => {
     return (
       <div className="container">
         <h1 className="app-title">AFTER 9</h1>
-      
+        <p style={{ fontSize: "13px", color: "#888", marginBottom: "10px" }}>Hi, {user} 👋</p>
 
         <div className="home-grid">
 
@@ -1183,6 +1276,9 @@ const Information = () => {
           </div>
         </div>
 
+        <button className="main-btn" onClick={handleLogout} style={{ marginTop: "20px" }}>
+          Log Out
+        </button>
 
       </div>
     );
@@ -1191,4 +1287,3 @@ const Information = () => {
 }
   
   export default App;
-
