@@ -309,38 +309,87 @@ function App() {
       );
     };
 
+    // ---------- SUPPORT GROUP ----------
+    const SupportGroup = () => {
 
+      const [view, setView] = useState("menu");
 
-  // ---------- MAIN MENU ----------
-  if (view === "menu") {
-    return (
-      <div className="container">
-        <h2>Support Groups</h2>
+      const [posts, setPosts] = useState(() => {
+        const saved = localStorage.getItem("supportPosts");
+        return saved ? JSON.parse(saved) : [];
+      });
 
-        <p>
-          Connect with other mothers, join conversations, or seek expert advice.
-        </p>
+      const [newPost, setNewPost] = useState("");
+      const [replyText, setReplyText] = useState({});
 
-        <div className="vertical-options">
-          <button className="main-btn" onClick={() => setView("new")}>
-            New Chat
-          </button>
+      const savePosts = (updatedPosts) => {
+        setPosts(updatedPosts);
+        localStorage.setItem("supportPosts", JSON.stringify(updatedPosts));
+      };
 
-          <button className="main-btn" onClick={() => setView("existing")}>
-            Existing Chats
-          </button>
+      const handlePostSubmit = () => {
+        if (!newPost.trim()) return;
 
-          <button className="main-btn" onClick={() => setView("expert")}>
-            Ask an Expert
+        const post = {
+          id: Date.now(),
+          content: newPost,
+          replies: [],
+          createdByUser: true
+        };
+
+        const updatedPosts = [post, ...posts];
+        savePosts(updatedPosts);
+        setNewPost("");
+      };
+
+      const handleReplySubmit = (postId) => {
+        if (!replyText[postId]?.trim()) return;
+
+        const updatedPosts = posts.map(post => {
+          if (post.id === postId) {
+            return {
+              ...post,
+              replies: [...post.replies, replyText[postId]]
+            };
+          }
+          return post;
+        });
+
+        savePosts(updatedPosts);
+        setReplyText({ ...replyText, [postId]: "" });
+      };
+
+    // ---------- MAIN MENU ----------
+    if (view === "menu") {
+      return (
+        <div className="container">
+          <h2>Support Groups</h2>
+
+          <p>
+            Connect with other mothers, join conversations, or seek expert advice.
+          </p>
+
+          <div className="vertical-options">
+            <button className="main-btn" onClick={() => setView("new")}>
+              New Chat
+            </button>
+
+            <button className="main-btn" onClick={() => setView("existing")}>
+              Existing Chats
+            </button>
+
+            <button className="main-btn" onClick={() => setView("expert")}>
+              Ask an Expert
+            </button>
+          </div>
+
+          <button className="main-btn" onClick={() => setPage("home")}>
+            Back to Home
           </button>
         </div>
-
-        <button className="main-btn" onClick={() => setPage("home")}>
-          Back to Home
-        </button>
-      </div>
-    );
-  }
+      );
+    }
+  
   // ---------- NEW CHAT ----------
   if (view === "new") {
     return (
@@ -373,6 +422,46 @@ function App() {
       </div>
     );
   }
+  // ---------- YOUR CHATS ----------
+  if (view === "yourChats") {
+    const userChats = posts.filter(post => post.createdByUser);
+
+    return (
+      <div className="container">
+        <h2>Your Chats</h2>
+
+        {userChats.length === 0 && (
+          <p>You haven't created any chats yet.</p>
+        )}
+
+        {userChats.map(post => (
+          <div
+            key={post.id}
+            style={{
+              textAlign: "left",
+              marginBottom: "20px",
+              padding: "10px",
+              background: "#f5f3ff",
+              borderRadius: "8px"
+            }}
+          >
+            <p><strong>You:</strong> {post.content}</p>
+
+            {post.replies.map((reply, index) => (
+              <p key={index} style={{ marginLeft: "15px" }}>
+                ↳ {reply}
+              </p>
+            ))}
+          </div>
+        ))}
+
+        <button className="main-btn" onClick={() => setView("new")}>
+          Back
+        </button>
+      </div>
+    );
+  }
+
     // ---------- EXISTING CHATS ----------
   if (view === "existing") {
     return (
@@ -405,6 +494,38 @@ function App() {
       </div>
     );
   }
+    // ---------- ASK AN EXPERT ----------
+  if (view === "expert") {
+    return (
+      <div className="container">
+        <h2>Ask an Expert</h2>
+
+        <p>
+          Submit your concern and a qualified health professional will respond.
+          This feature can later connect to real clinicians.
+        </p>
+
+        <textarea
+          placeholder="Describe your concern..."
+          style={{ width: "100%", minHeight: "80px", marginTop: "10px" }}
+        />
+
+        <button className="main-btn" style={{ marginTop: "15px" }}>
+          Submit to Expert
+        </button>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+    );
+  }
+};
+
+
+
+
+}
 
 
 
@@ -476,7 +597,7 @@ function App() {
     );
     
 
-}
+
   
   export default App;
 
