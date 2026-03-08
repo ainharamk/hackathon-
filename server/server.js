@@ -2,13 +2,15 @@ const express = require("express");
 const mysql = require("mysql2");
 
 const app = express();
+const cors = require("cors");
 app.use(express.json());
+app.use(cors());
 
 // MySQL connection pool
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "Password",    // change this password to work on your servers
+    password: "Password1.",    // change this password to work on your servers
     database: "hackathon",
     waitForConnections: true,
     connectionLimit: 10,
@@ -39,7 +41,7 @@ app.get("/users", (req, res) => {
     });
 });
 
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
@@ -130,24 +132,63 @@ app.get("/forum", (req, res) => {
 });
 
 
-fetch("http://localhost:3000/tracker", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    mood: "Happy",
-    hoursSlept: 7
-  })
+
+app.get("/forum/posts", (req, res) => {
+
+  const sql = `
+    SELECT p.*, 
+    JSON_ARRAYAGG(r.message) AS replies
+    FROM forum_posts p
+    LEFT JOIN forum_replies r
+    ON p.id = r.post_id
+    GROUP BY p.id
+    ORDER BY p.created_at DESC
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).send(err);
+    res.json(results);
+  });
+
 });
 
-fetch("http://localhost:3000/forum", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    username: "Alex",
-    message: "Today was difficult but I'm trying."
-  })
+app.post("/forum/posts", (req, res) => {
+
+  const { id, content } = req.body;
+
+  const sql =
+  "INSERT INTO forum_posts (id, content, created_by_user) VALUES (?, ?, true)";
+
+  db.query(sql, [id, content], err => {
+    if (err) return res.status(500).send(err);
+    res.json({ message: "Post created" });
+  });
+
+});
+
+app.post("/forum/replies", (req, res) => {
+
+  const { postId, message } = req.body;
+
+  const sql =
+  "INSERT INTO forum_replies (post_id, message) VALUES (?, ?)";
+
+  db.query(sql, [postId, message], err => {
+    if (err) return res.status(500).send(err);
+    res.json({ message: "Reply added" });
+  });
+
+});
+
+app.delete("/forum/posts/:id", (req, res) => {
+
+  db.query(
+    "DELETE FROM forum_posts WHERE id = ?",
+    [req.params.id],
+    err => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: "Post deleted" });
+    }
+  );
+
 });
