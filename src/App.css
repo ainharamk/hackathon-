@@ -37,4 +37,20 @@ button:hover {
   background-color: #c4b5fd;
 }
 
+.main-btn {
+  background-color: #8b5cf6;
+  color: white;
+  padding: 10px 20px;
+  margin-top: 15px;
+}
+
+.alert {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-radius: 8px;
+}
+
+
 
