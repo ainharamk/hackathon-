@@ -43,3 +43,22 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+app.post("/stats", (req, res) => {
+    const { page, action, value } = req.body;
+
+    const sql = "INSERT INTO daily_stats (page, action, value) VALUES (?, ?, ?)";
+
+    db.query(sql, [page, action, value], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Database error");
+            return;
+        }
+
+        res.json({
+            message: "Stat saved",
+            id: result.insertId
+        });
+    });
+});
