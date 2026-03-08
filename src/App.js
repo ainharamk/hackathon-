@@ -311,7 +311,7 @@ function App() {
 
 
 
-      // ---------- MAIN MENU ----------
+  // ---------- MAIN MENU ----------
   if (view === "menu") {
     return (
       <div className="container">
@@ -337,6 +337,38 @@ function App() {
 
         <button className="main-btn" onClick={() => setPage("home")}>
           Back to Home
+        </button>
+      </div>
+    );
+  }
+  // ---------- NEW CHAT ----------
+  if (view === "new") {
+    return (
+      <div className="container">
+        <h2>Start a New Chat</h2>
+
+        <textarea
+          placeholder="Write your question or share something..."
+          value={newPost}
+          onChange={(e) => setNewPost(e.target.value)}
+          style={{ width: "100%", minHeight: "80px", marginTop: "10px" }}
+        />
+
+        <button className="main-btn" onClick={handlePostSubmit}>
+          Post
+        </button>
+
+        <div className="vertical-options" style={{ marginTop: "20px" }}>
+          <button
+            className="main-btn"
+            onClick={() => setView("yourChats")}
+          >
+            Your Chats
+          </button>
+        </div>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
         </button>
       </div>
     );
