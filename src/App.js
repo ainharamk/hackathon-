@@ -257,12 +257,13 @@ function App() {
             {questions[currentQuestion].options.map((option, index) => (
               <button
                 key={index}
-                className="option-btn"
+                className={`option-btn ${answers[currentQuestion] === option ? "active" : ""}`}
                 onClick={() => handleAnswer(option)}
               >
                 {option}
               </button>
             ))}
+            
           </div>
 
           <div style={{ marginTop: "20px" }}>
