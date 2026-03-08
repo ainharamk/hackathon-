@@ -1182,6 +1182,9 @@ const Information = () => {
             Mood tracker
           </div>
         </div>
+      <div className="home-card" onClick={() => setPage("calendar")}>
+        Mood Calendar
+      </div>
 
 
       </div>
