@@ -535,160 +535,225 @@ const Information = () => {
 
   const [view, setView] = useState("menu");
 
-    // ---------- MAIN ARTICLE MENU ----------
-      if (view === "menu") {
-        return (
-          <div className="container">
-            <h2>Information & Awareness</h2>
-
-            <p>
-              Explore educational articles about postpartum mental health,
-              symptoms, recovery, and real experiences.
-            </p>
-
-            <div className="article-grid">
-
-              <div className="article-card" onClick={() => setView("article1")}>
-                Article 1
-              </div>
-
-              <div className="article-card" onClick={() => setView("article2")}>
-                Article 2
-              </div>
-
-              <div className="article-card" onClick={() => setView("article3")}>
-                Article 3
-              </div>
-
-              <div className="article-card" onClick={() => setView("article4")}>
-                Article 4
-              </div>
-
-              <div className="article-card" onClick={() => setView("article5")}>
-                Article 5
-              </div>
-
-              <div className="article-card" onClick={() => setView("article6")}>
-                Article 6
-              </div>
-
-            </div>
-
-            <button className="main-btn" onClick={() => setPage("home")}>
-              Back to Home
-            </button>
-          </div>
-        );
-      }
-
-    // ---------- ARTICLE 1 ----------
-    if (view === "article1") {
-      return (
-        <div className="container">
-          <h2>About Postpartum Depression</h2>
-
-          <p>
-            Postpartum depression is a mood disorder that can occur after childbirth.
-            If untreated, it may progress into chronic major depressive disorder.
-          </p>
-
-          <h3>Common Symptoms</h3>
-          <ul>
-            <li>Persistent sadness</li>
-            <li>Loss of interest in activities</li>
-            <li>Sleep disturbance</li>
-            <li>Feelings of guilt or worthlessness</li>
-            <li>Difficulty bonding with baby</li>
-          </ul>
-
-          <button className="main-btn" onClick={() => setView("menu")}>
-            Back
-          </button>
-        </div>
-      );
-    }
-    // ---------- ARTICLE 2 ----------
-    if (view === "article2") 
-    {
-      return (
+  // ---------- MAIN ARTICLE MENU ----------
+  if (view === "menu") {
+    return (
       <div className="container">
+        <h2>Information & Awareness</h2>
+
+        <p>
+          This section provides educational resources about postpartum mental
+          health, including symptoms, risk factors, recovery strategies, and
+          real-world experiences. Increasing awareness helps families and
+          communities better understand how to support new mothers.
+        </p>
+
+        <div className="article-grid">
+
+          <div className="article-card" onClick={() => setView("article1")}>
+            Understanding Postpartum Depression
+          </div>
+
+          <div className="article-card" onClick={() => setView("article2")}>
+            Risk Factors
+          </div>
+
+          <div className="article-card" onClick={() => setView("article3")}>
+            Treatment & Recovery
+          </div>
+
+          <div className="article-card" onClick={() => setView("article4")}>
+            Public Awareness & Real Stories
+          </div>
+
+          <div className="article-card" onClick={() => setView("article5")}>
+            Reducing Stigma
+          </div>
+
+          <div className="article-card" onClick={() => setView("article6")}>
+            When to Seek Help
+          </div>
+
+        </div>
+
+        <button className="main-btn" onClick={() => setPage("home")}>
+          Back to Home
+        </button>
+      </div>
+    );
+  }
+
+  // ---------- ARTICLE 1 ----------
+  if (view === "article1") {
+    return (
+      <div className="container article">
+        <h2>Understanding Postpartum Depression</h2>
+
+        <p>
+          Postpartum depression (PPD) is a mood disorder that can affect
+          individuals after childbirth. It involves emotional, psychological,
+          and physical changes that may interfere with a mother's wellbeing
+          and her ability to carry out daily activities.
+        </p>
+
+        <p>
+          Research suggests that postpartum depression affects a significant
+          proportion of new mothers worldwide. Early recognition and support
+          are essential to ensure healthy recovery for both mother and child.
+        </p>
+
+        <h3>Common Symptoms</h3>
+        <ul>
+          <li>Persistent sadness or low mood</li>
+          <li>Loss of interest in previously enjoyed activities</li>
+          <li>Sleep disturbances or extreme fatigue</li>
+          <li>Feelings of guilt, hopelessness, or worthlessness</li>
+          <li>Difficulty bonding with the baby</li>
+        </ul>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+    );
+  }
+
+  // ---------- ARTICLE 2 ----------
+  if (view === "article2") {
+    return (
+      <div className="container article">
         <h2>Risk Factors</h2>
 
         <p>
-          Factors such as lack of support, previous depression,
-          traumatic birth experience, or hormonal changes can increase risk.
+          Several biological, psychological, and social factors can increase
+          the likelihood of developing postpartum depression.
+        </p>
+
+        <ul>
+          <li>Lack of emotional or practical support</li>
+          <li>History of depression or anxiety</li>
+          <li>Hormonal changes following childbirth</li>
+          <li>Stressful life circumstances</li>
+          <li>Traumatic or complicated birth experiences</li>
+        </ul>
+
+        <p>
+          Identifying these risk factors early can help healthcare providers
+          and families provide better preventative support.
         </p>
 
         <button className="main-btn" onClick={() => setView("menu")}>
           Back
         </button>
       </div>
-      );
-    }
+    );
+  }
 
   // ---------- ARTICLE 3 ----------
   if (view === "article3") {
-  return (
-    <div className="container">
-      <h2>Treatment & Recovery</h2>
+    return (
+      <div className="container article">
+        <h2>Treatment & Recovery</h2>
 
-      <p>
-      Treatment may include therapy, medication, lifestyle adjustments,
-      and increased social support.
-      </p>
+        <p>
+          Postpartum depression is treatable, and many individuals recover
+          successfully with appropriate support. Treatment approaches often
+          include psychological therapies, medical care, and strong social
+          support systems.
+        </p>
 
-      <button className="main-btn" onClick={() => setView("menu")}>
-      Back
-      </button>
-    </div>
+        <ul>
+          <li>Cognitive behavioural therapy (CBT)</li>
+          <li>Professional counselling</li>
+          <li>Medication prescribed by healthcare professionals</li>
+          <li>Peer support groups</li>
+          <li>Family and partner involvement</li>
+        </ul>
+
+        <p>
+          Early intervention significantly improves recovery outcomes and
+          helps mothers regain emotional wellbeing.
+        </p>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
     );
   }
-   // ---------- ARTICLE 4 ----------
+
+  // ---------- ARTICLE 4 ----------
   if (view === "article4") {
-  return (
-  <div className="container">
-  <h2>Public Figures Who Spoke Out</h2>
+    return (
+      <div className="container article">
+        <h2>Public Awareness & Real Stories</h2>
 
-  <ul>
-  <li>Adele – shared her experience with postpartum depression</li>
-  <li>Chrissy Teigen – discussed her postpartum mental health journey</li>
-  <li>Serena Williams – spoke about emotional challenges after childbirth</li>
-  </ul>
+        <p>
+          Public figures sharing their experiences can help reduce stigma and
+          raise awareness of postpartum mental health challenges.
+        </p>
 
-  <button className="main-btn" onClick={() => setView("menu")}>
-  Back
-  </button>
-  </div>
-  );
+        <p>
+          Tennis champion Serena Williams publicly discussed the emotional
+          difficulties she experienced after giving birth. By speaking openly
+          about postpartum struggles, she helped highlight that mental health
+          challenges after childbirth can affect anyone regardless of status
+          or success.
+        </p>
+
+        <p>
+          Other public figures such as Adele and Chrissy Teigen have also
+          spoken about their experiences, encouraging open conversations
+          around maternal mental health.
+        </p>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+    );
   }
 
   // ---------- ARTICLE 5 ----------
   if (view === "article5") {
-  return (
-  <div className="container">
-  <h2>Reducing Stigma</h2>
+    return (
+      <div className="container article">
+        <h2>Reducing Stigma</h2>
 
-  <p>
-  Increasing awareness reduces stigma and promotes early intervention.
-  Open discussion encourages mothers to seek help sooner.
-  </p>
+        <p>
+          Many mothers hesitate to seek help due to stigma or fear of being
+          judged. Increasing awareness and education helps normalize
+          discussions around postpartum mental health.
+        </p>
 
-  <button className="main-btn" onClick={() => setView("menu")}>
-  Back
-  </button>
-  </div>
-  );
+        <p>
+          Open conversations between families, healthcare providers, and
+          communities encourage individuals to seek support earlier and
+          improve recovery outcomes.
+        </p>
+
+        <button className="main-btn" onClick={() => setView("menu")}>
+          Back
+        </button>
+      </div>
+    );
   }
 
   // ---------- ARTICLE 6 ----------
   if (view === "article6") {
     return (
-      <div className="container">
+      <div className="container article">
         <h2>When to Seek Help</h2>
 
         <p>
-          If symptoms last longer than two weeks, interfere with daily life,
-          or include thoughts of self-harm, professional support is strongly advised.
+          Professional support should be considered if symptoms persist for
+          more than two weeks, significantly affect daily functioning, or
+          include thoughts of self-harm.
+        </p>
+
+        <p>
+          Healthcare providers, therapists, and support groups can provide
+          guidance and treatment options to support recovery.
         </p>
 
         <button className="main-btn" onClick={() => setView("menu")}>
@@ -697,10 +762,6 @@ const Information = () => {
       </div>
     );
   }
-
-
-
-
 };
 
 
