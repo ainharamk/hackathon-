@@ -172,6 +172,11 @@ button:hover {
   font-weight: bold;
 }
 
+.option-btn.active {
+  background-color: #8b5cf6;
+  color: white;
+}
+
 /* Section spacing */
 
 .tracker-card p {
