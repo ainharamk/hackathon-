@@ -5,6 +5,11 @@ function App() {
 
   const [user, setUser] = useState(() => localStorage.getItem("currentUser") || null);
   const [inputName, setInputName] = useState("");
+  const [page, setPage] = useState("home");
+  const [mood, setMood] = useState(null);
+  const [sleep, setSleep] = useState(null);
+  const [weeklyScore, setWeeklyScore] = useState(null);
+  const [lastLog, setLastLog] = useState(null);
 
   const handleLogin = () => {
     if (!inputName.trim()) return;
@@ -32,12 +37,6 @@ function App() {
       </div>
     );
   }
-
-  const [page, setPage] = useState("home");
-  const [mood, setMood] = useState(null);
-  const [sleep, setSleep] = useState(null);
-  const [weeklyScore, setWeeklyScore] = useState(null);
-  const [lastLog, setLastLog] = useState(null);
 
     // Load last saved log on app start
     useEffect(() => {
