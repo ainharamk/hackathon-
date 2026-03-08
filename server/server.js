@@ -28,7 +28,7 @@ db.getConnection((err, connection) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("Server is running");
+  res.send("Server is running");
 });
 
 app.get("/users", (req, res) => {
@@ -42,7 +42,7 @@ app.get("/users", (req, res) => {
     });
 });
 
-const PORT = 3001;
+const PORT = 27275;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

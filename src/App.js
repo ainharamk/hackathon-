@@ -720,7 +720,7 @@ const SupportGroup = () => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:3001/forum/posts")
+    fetch("http://localhost:27275/forum")
       .then(res => res.json())
       .then(data => setPosts(data));
   }, []);
@@ -737,7 +737,7 @@ const SupportGroup = () => {
 
     };
 
-    await fetch("http://localhost:3001/forum/posts", {
+    await fetch("http://localhost:27275/forum/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -755,7 +755,7 @@ const SupportGroup = () => {
     const text = replyText[postId];
     if (!text?.trim()) return;
 
-    await fetch("http://localhost:3001/forum/replies", {
+    await fetch("http://localhost:27275/forum/replies", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -886,7 +886,7 @@ const SupportGroup = () => {
         onClick={async () => {
 
           await fetch(
-            `http://localhost:3001/forum/posts/${post.id}`,
+            `http://localhost:27275/forum/posts/${post.id}`,
             { method: "DELETE" }
           );
 
@@ -933,7 +933,7 @@ const SupportGroup = () => {
               onClick={async () => {
 
                 await fetch(
-                  `http://localhost:3001/forum/posts/${post.id}`,
+                  `http://localhost:27275/forum/posts/${post.id}`,
                   { method: "DELETE" }
                 );
 
