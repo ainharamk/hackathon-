@@ -714,7 +714,7 @@ const SupportGroup = () => {
 
 
   useEffect(() => {
-    fetch("http://localhost:27275/forum")
+    fetch("/forum")
       .then(res => res.json())
       .then(data => setPosts(data));
   }, []);
@@ -731,7 +731,7 @@ const SupportGroup = () => {
 
     };
 
-    await fetch("http://localhost:27275/forum/posts", {
+    await fetch("/forum/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
