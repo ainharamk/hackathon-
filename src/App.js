@@ -27,17 +27,10 @@ function App() {
     const DailyTracker = () => {
 
       const handleSubmit = () => {
-        if (!mood || !sleep) return;
-
-        const log = {
-          mood,
-          sleep,
-          date: new Date().toLocaleDateString()
-        };
-
-        localStorage.setItem("dailyLog", JSON.stringify(log));
-        setLastLog(log);
-        setPage("dailyResult");
+      const key = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
+      const allLogs = JSON.parse(localStorage.getItem("allLogs") || "{}");
+      allLogs[key] = { mood, sleep };
+      localStorage.setItem("allLogs", JSON.stringify(allLogs));
       };
 
       return (
@@ -708,7 +701,81 @@ const Information = () => {
     );
   }
 
+  // ---------- CALENDAR PAGE ----------
+  const CalendarPage = () => {
+    const today = new Date();
+    const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
+    const logs = (() => {
+      const saved = localStorage.getItem("allLogs");
+      return saved ? JSON.parse(saved) : {};
+    })();
+
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+
+    const monthName = viewDate.toLocaleString("default", { month: "long" });
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
+    const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+
+    const getMoodColor = (mood) => {
+      if (!mood) return "#f0f0f0";
+      if (mood <= 2) return "#ffb3b3";
+      if (mood === 3) return "#fff0a0";
+      return "#b3f0c2";
+    };
+
+    const blanks = Array(firstDay).fill(null);
+    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+    return (
+      <div className="container">
+        <h2>Mood Calendar</h2>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+          <button className="main-btn" onClick={prevMonth}>← Prev</button>
+          <strong>{monthName} {year}</strong>
+          <button className="main-btn" onClick={nextMonth}>Next →</button>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", textAlign: "center" }}>
+          {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
+            <div key={d} style={{ fontWeight: "bold", fontSize: "12px", padding: "4px" }}>{d}</div>
+          ))}
+
+          {blanks.map((_, i) => <div key={"b"+i} />)}
+
+          {days.map(day => {
+            const key = `${year}-${month+1}-${day}`;
+            const log = logs[key];
+            return (
+              <div key={day} style={{
+                background: getMoodColor(log?.mood),
+                borderRadius: "6px",
+                padding: "6px 2px",
+                fontSize: "13px"
+              }}>
+                <div>{day}</div>
+                {log && <div style={{ fontSize: "10px" }}>😴{log.sleep}h</div>}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ marginTop: "15px", fontSize: "13px" }}>
+          <span style={{ background: "#b3f0c2", padding: "2px 8px", borderRadius: "4px", marginRight: "8px" }}>Good mood</span>
+          <span style={{ background: "#fff0a0", padding: "2px 8px", borderRadius: "4px", marginRight: "8px" }}>OK</span>
+          <span style={{ background: "#ffb3b3", padding: "2px 8px", borderRadius: "4px" }}>Low mood</span>
+        </div>
+
+        <br />
+        <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+      </div>
+    );
+  };
 
 
 };
@@ -736,7 +803,7 @@ const Information = () => {
     if (page === "support") return <SupportGroup />;
     if (page === "emergency") return <EmergencyContacts />;
     if (page === "info") return <Information />;
-
+    if (page === "calendar") return <CalendarPage />;
 
 
 
@@ -783,6 +850,13 @@ const Information = () => {
         >
           Information & Awareness
         </div>
+        <div
+          className="home-card"
+          onClick={() => setPage("calendar")}
+        >
+          Mood Calendar
+        </div>
+
 
       </div>
       </div>
