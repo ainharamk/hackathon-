@@ -311,20 +311,36 @@ function App() {
 
 
 
+      // ---------- MAIN MENU ----------
+  if (view === "menu") {
+    return (
+      <div className="container">
+        <h2>Support Groups</h2>
 
+        <p>
+          Connect with other mothers, join conversations, or seek expert advice.
+        </p>
 
+        <div className="vertical-options">
+          <button className="main-btn" onClick={() => setView("new")}>
+            New Chat
+          </button>
 
+          <button className="main-btn" onClick={() => setView("existing")}>
+            Existing Chats
+          </button>
 
+          <button className="main-btn" onClick={() => setView("expert")}>
+            Ask an Expert
+          </button>
+        </div>
 
-
-
-
-
-
-
-   
-
-
+        <button className="main-btn" onClick={() => setPage("home")}>
+          Back to Home
+        </button>
+      </div>
+    );
+  }
 
     // Add other code above this line as below it is the UI and we want to keep a clean structure
 
