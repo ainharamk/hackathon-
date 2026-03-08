@@ -2,6 +2,37 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
+
+  const [user, setUser] = useState(() => localStorage.getItem("currentUser") || null);
+  const [inputName, setInputName] = useState("");
+
+  const handleLogin = () => {
+    if (!inputName.trim()) return;
+    localStorage.setItem("currentUser", inputName.trim());
+    setUser(inputName.trim());
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setUser(null);
+  };
+
+  if (!user) {
+    return (
+      <div className="container">
+        <h1 className="app-title">AFTER 9</h1>
+        <p>Enter your name to continue</p>
+        <input
+          placeholder="Your name..."
+          value={inputName}
+          onChange={(e) => setInputName(e.target.value)}
+          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%" }}
+        />
+        <button className="main-btn" onClick={handleLogin}>Continue</button>
+      </div>
+    );
+  }
+
   const [page, setPage] = useState("home");
   const [mood, setMood] = useState(null);
   const [sleep, setSleep] = useState(null);
@@ -10,7 +41,7 @@ function App() {
 
     // Load last saved log on app start
     useEffect(() => {
-      const saved = localStorage.getItem("dailyLog");
+      const saved = localStorage.getItem(`${user}_dailyLog`);
       if (saved) {
         setLastLog(JSON.parse(saved));
       }
@@ -28,7 +59,7 @@ function App() {
           date: new Date().toLocaleDateString()
         };
 
-        localStorage.setItem("dailyLog", JSON.stringify(log));
+        localStorage.setItem(`${user}_dailyLog`, JSON.stringify(log));
         setLastLog(log);
         setPage("dailyResult");
       };
@@ -175,8 +206,8 @@ function App() {
         {
           question: "6. Things have been getting on top of me:",
           options: [
-            "Yes, most of the time I haven’t been able to cope at all",
-            "Yes, sometimes I haven’t been coping as well as usual",
+            "Yes, most of the time I haven't been able to cope at all",
+            "Yes, sometimes I haven't been coping as well as usual",
             "No, most of the time I have coped quite well",
             "No, I have been coping as well as ever"
           ]
@@ -316,7 +347,7 @@ const SupportGroup = () => {
   const [view, setView] = useState("menu");
 
   const [posts, setPosts] = useState(() => {
-    const saved = localStorage.getItem("supportPosts");
+    const saved = localStorage.getItem(`${user}_supportPosts`);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -325,7 +356,7 @@ const SupportGroup = () => {
 
   const savePosts = (updatedPosts) => {
     setPosts(updatedPosts);
-    localStorage.setItem("supportPosts", JSON.stringify(updatedPosts));
+    localStorage.setItem(`${user}_supportPosts`, JSON.stringify(updatedPosts));
   };
 
   const handlePostSubmit = () => {
@@ -775,6 +806,11 @@ const Information = () => {
         </div>
 
       </div>
+
+      <button className="main-btn" onClick={handleLogout} style={{ marginTop: "20px" }}>
+        Log Out
+      </button>
+
       </div>
     );
     
@@ -782,4 +818,3 @@ const Information = () => {
 }
   
   export default App;
-
