@@ -132,3 +132,24 @@ button:hover {
   grid-column: span 2;
   aspect-ratio: 2 / 1;
 }
+
+/* ---------- DAILY TRACKER LAYOUT ---------- */
+
+.daily-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* Last log card */
+
+.last-log-card {
+  min-width: 140px;
+  background: #f5f3ff;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 14px;
+  box-shadow: inset 0 0 0 1px #ddd6fe;
+}
+
