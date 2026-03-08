@@ -711,12 +711,7 @@ const SupportGroup = () => {
   const [showReplies, setShowReplies] = useState({});
 
   const [newPost, setNewPost] = useState("");
-  const [replyText, setReplyText] = useState({});
 
-  const savePosts = (updatedPosts) => {
-    setPosts(updatedPosts);
-    localStorage.setItem(`${user}_supportPosts`, JSON.stringify(updatedPosts));
-  };
 
   useEffect(() => {
     fetch("http://localhost:27275/forum")
@@ -749,36 +744,6 @@ const SupportGroup = () => {
 
   };
 
-  const handleReplySubmit = async (postId) => {
-
-    const text = replyText[postId];
-    if (!text?.trim()) return;
-
-    await fetch("http://localhost:27275/forum/replies", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        postId,
-        message: text
-      })
-    });
-
-    const updatedPosts = posts.map(post => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          replies: [...post.replies, text]
-        };
-      }
-      return post;
-    });
-
-    setPosts(updatedPosts);
-    setReplyText({ ...replyText, [postId]: "" });
-
-  };
 
 
   // ---------- MAIN MENU ----------
