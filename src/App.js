@@ -19,12 +19,17 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
+    setMood(null);
+    setSleep(null);
+    setLastLog(null);
+    setPage("home");
     setUser(null);
   };
 
   // Load last saved log on app start
   useEffect(() => {
     if (!user) return;
+    setLastLog(null);
     const saved = localStorage.getItem(`${user}_dailyLog`);
     if (saved) {
       setLastLog(JSON.parse(saved));
