@@ -134,15 +134,18 @@ app.delete("/forum/posts/:id", (req, res) => {
 });
 
 // ---------- SERVER ----------
+const path = require("path");
 const PORT = process.env.PORT || 5000;
 
-const path = require("path");
-
+// Serve static files from React build
 app.use(express.static(path.join(__dirname, "../build")));
 
-app.get("*", (req, res) => {
+// Serve index.html on all unmatched routes (React Router support)
+app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "../build/index.html"));
 });
+
+// Start server
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
