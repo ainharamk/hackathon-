@@ -642,6 +642,42 @@ const Information = () => {
     </div>
     );
   }
+   // ---------- ARTICLE 4 ----------
+  if (view === "article4") {
+  return (
+  <div className="container">
+  <h2>Public Figures Who Spoke Out</h2>
+
+  <ul>
+  <li>Adele – shared her experience with postpartum depression</li>
+  <li>Chrissy Teigen – discussed her postpartum mental health journey</li>
+  <li>Serena Williams – spoke about emotional challenges after childbirth</li>
+  </ul>
+
+  <button className="main-btn" onClick={() => setView("menu")}>
+  Back
+  </button>
+  </div>
+  );
+  }
+
+  // ---------- ARTICLE 5 ----------
+  if (view === "article5") {
+  return (
+  <div className="container">
+  <h2>Reducing Stigma</h2>
+
+  <p>
+  Increasing awareness reduces stigma and promotes early intervention.
+  Open discussion encourages mothers to seek help sooner.
+  </p>
+
+  <button className="main-btn" onClick={() => setView("menu")}>
+  Back
+  </button>
+  </div>
+  );
+  }
 
 
 
