@@ -12,7 +12,6 @@ function App() {
   const [page, setPage] = useState("home");
   const [mood, setMood] = useState(null);
   const [sleep, setSleep] = useState(null);
-  const [weeklyScore, setWeeklyScore] = useState(null);
   const [lastLog, setLastLog] = useState(null);
 
   const handleLogin = () => {
