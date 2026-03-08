@@ -850,7 +850,7 @@ const SupportGroup = () => {
         onClick={async () => {
 
           await fetch(
-            `http://localhost:27275/forum/posts/${post.id}`,
+            `/forum/posts/${post.id}`,
             { method: "DELETE" }
           );
 
@@ -897,7 +897,7 @@ const SupportGroup = () => {
               onClick={async () => {
 
                 await fetch(
-                  `http://localhost:27275/forum/posts/${post.id}`,
+                  `/forum/posts/${post.id}`,
                   { method: "DELETE" }
                 );
 
