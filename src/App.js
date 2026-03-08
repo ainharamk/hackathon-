@@ -3,8 +3,15 @@ import "./App.css";
 
 function App() {
   const [page, setPage] = useState("home");
-  const [mood, setMood] = useState(null);
-  const [sleep, setSleep] = useState(null);
+  const [mood, setMood] = useState(() => {
+    const saved = localStorage.getItem("dailyLog");
+    return saved ? JSON.parse(saved).mood : null;
+  });
+
+  const [sleep, setSleep] = useState(() => {
+    const saved = localStorage.getItem("dailyLog");
+    return saved ? JSON.parse(saved).sleep : null;
+  });
   const [weeklyScore, setWeeklyScore] = useState(null);
   const [lastLog, setLastLog] = useState(null);
 
@@ -106,22 +113,26 @@ function App() {
       else if (mood >= 4) {
         message = "Good job, keep going!";
       }
+    return (
+      <div className="container">
+        <h2>Daily Summary</h2>
 
-      return (
-        <div className="container">
-
-          <h2>Daily Summary</h2>
-
-          <div className="alert">
-            {message}
-          </div>
-
-          <button className="main-btn" onClick={() => setPage("home")}>
-            Go Back Home
-          </button>
-
+        <div className="alert">
+          {message}
         </div>
-      );
+
+        <div className="last-log-wide">
+          <h3>TODAY'S LOG</h3>
+          <p><strong>Mood:</strong> {mood} / 5</p>
+          <p><strong>Sleep:</strong> {sleep} hrs</p>
+          <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+        </div>
+
+        <button className="main-btn" onClick={() => setPage("home")}>
+          Go Back Home
+        </button>
+      </div>
+    );
     };
 
     // ---------- MONTHLY CHECK-IN ----------
