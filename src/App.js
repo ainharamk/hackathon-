@@ -21,15 +21,26 @@ function App() {
       return;
     }
     const storedPassword = localStorage.getItem(`${name}_password`);
-    if (!storedPassword) {
+
+    if (authMode === "register") {
+      if (storedPassword) {
+        setLoginError("That username is already taken. Please log in.");
+        return;
+      }
       localStorage.setItem(`${name}_password`, pass);
       localStorage.setItem("currentUser", name);
       setUser(name);
-    } else if (storedPassword === pass) {
+    } else {
+      if (!storedPassword) {
+        setLoginError("No account found. Please register first.");
+        return;
+      }
+      if (storedPassword !== pass) {
+        setLoginError("Incorrect password.");
+        return;
+      }
       localStorage.setItem("currentUser", name);
       setUser(name);
-    } else {
-      setLoginError("Incorrect password for that username.");
     }
   };
 
@@ -52,10 +63,30 @@ function App() {
     }
   }, [user]);
 
+  const [authMode, setAuthMode] = useState("login");
+
   if (!user) {
     return (
       <div className="container">
         <h1 className="app-title">AFTER 9</h1>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
+          <button
+            className="main-btn"
+            style={{ opacity: authMode === "login" ? 1 : 0.4 }}
+            onClick={() => { setAuthMode("login"); setLoginError(""); }}
+          >
+            Login
+          </button>
+          <button
+            className="main-btn"
+            style={{ opacity: authMode === "register" ? 1 : 0.4 }}
+            onClick={() => { setAuthMode("register"); setLoginError(""); }}
+          >
+            Register
+          </button>
+        </div>
+
         <p style={{ marginBottom: "5px" }}>Username</p>
         <input
           placeholder="Username..."
@@ -72,8 +103,9 @@ function App() {
           style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
         />
         {loginError && <p style={{ color: "#991b1b", fontSize: "13px" }}>{loginError}</p>}
-        <p style={{ fontSize: "12px", color: "#888" }}>New user? Your account will be created automatically.</p>
-        <button className="main-btn" onClick={handleLogin}>Continue</button>
+        <button className="main-btn" onClick={handleLogin}>
+          {authMode === "login" ? "Login" : "Create Account"}
+        </button>
       </div>
     );
   }
