@@ -481,7 +481,9 @@ const SupportGroup = () => {
       </div>
     );
   }
-}
+};
+
+
 
 // ---------- EMERGENCY CONTACTS ----------
 const EmergencyContacts = () => (

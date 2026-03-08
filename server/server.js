@@ -8,7 +8,7 @@ app.use(express.json());
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "Password",
+    password: "Password",    // change this password to work on your servers
     database: "hackathon",
     waitForConnections: true,
     connectionLimit: 10,
