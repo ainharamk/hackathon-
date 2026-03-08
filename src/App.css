@@ -52,7 +52,6 @@ button:hover {
   border-radius: 8px;
 }
 
-
 .vertical-options {
   display: flex;
   flex-direction: column;
@@ -178,4 +177,32 @@ button:hover {
 .tracker-card p {
   margin-top: 15px;
   font-weight: 500;
+}
+
+/* Yesterday Log Wide Card */
+
+.last-log-wide {
+  background: #f5f3ff;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px #ddd6fe;
+}
+
+.last-log-wide h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #6b21a8;
+}
+
+/* App Title */
+
+.app-title {
+  width: 100%;
+  font-size: 73px;
+  letter-spacing: 1px;
+  margin: 5px 0;
+  text-align: center;
 }
