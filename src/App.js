@@ -5,6 +5,8 @@ function App() {
 
   const [user, setUser] = useState(() => localStorage.getItem("currentUser") || null);
   const [inputName, setInputName] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
   const [page, setPage] = useState("home");
   const [mood, setMood] = useState(null);
   const [sleep, setSleep] = useState(null);
@@ -12,9 +14,23 @@ function App() {
   const [lastLog, setLastLog] = useState(null);
 
   const handleLogin = () => {
-    if (!inputName.trim()) return;
-    localStorage.setItem("currentUser", inputName.trim());
-    setUser(inputName.trim());
+    const name = inputName.trim();
+    const pass = inputPassword.trim();
+    if (!name || !pass) {
+      setLoginError("Please enter both a username and password.");
+      return;
+    }
+    const storedPassword = localStorage.getItem(`${name}_password`);
+    if (!storedPassword) {
+      localStorage.setItem(`${name}_password`, pass);
+      localStorage.setItem("currentUser", name);
+      setUser(name);
+    } else if (storedPassword === pass) {
+      localStorage.setItem("currentUser", name);
+      setUser(name);
+    } else {
+      setLoginError("Incorrect password for that username.");
+    }
   };
 
   const handleLogout = () => {
@@ -40,13 +56,23 @@ function App() {
     return (
       <div className="container">
         <h1 className="app-title">AFTER 9</h1>
-        <p>Enter your name to continue</p>
+        <p style={{ marginBottom: "5px" }}>Username</p>
         <input
-          placeholder="Your name..."
+          placeholder="Username..."
           value={inputName}
-          onChange={(e) => setInputName(e.target.value)}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%" }}
+          onChange={(e) => { setInputName(e.target.value); setLoginError(""); }}
+          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
         />
+        <p style={{ marginBottom: "5px" }}>Password</p>
+        <input
+          type="password"
+          placeholder="Password..."
+          value={inputPassword}
+          onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }}
+          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
+        />
+        {loginError && <p style={{ color: "#991b1b", fontSize: "13px" }}>{loginError}</p>}
+        <p style={{ fontSize: "12px", color: "#888" }}>New user? Your account will be created automatically.</p>
         <button className="main-btn" onClick={handleLogin}>Continue</button>
       </div>
     );
