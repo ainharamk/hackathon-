@@ -22,6 +22,15 @@ function App() {
     setUser(null);
   };
 
+  // Load last saved log on app start
+  useEffect(() => {
+    if (!user) return;
+    const saved = localStorage.getItem(`${user}_dailyLog`);
+    if (saved) {
+      setLastLog(JSON.parse(saved));
+    }
+  }, [user]);
+
   if (!user) {
     return (
       <div className="container">
@@ -37,14 +46,6 @@ function App() {
       </div>
     );
   }
-
-    // Load last saved log on app start
-    useEffect(() => {
-      const saved = localStorage.getItem(`${user}_dailyLog`);
-      if (saved) {
-        setLastLog(JSON.parse(saved));
-      }
-    }, []);
   
     // ---------- DAILY TRACKER ----------
     const DailyTracker = () => {
