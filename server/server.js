@@ -8,7 +8,7 @@ const app = express();
 // ---------- MIDDLEWARE ----------
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:27275" // adjust as needed
+  origin: process.env.FRONTEND_URL || "https://hackathon-production-d745.up.railway.app/" // adjust as needed
 }));
 
 // ---------- DATABASE CONNECTION ----------
