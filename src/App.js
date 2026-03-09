@@ -23,11 +23,16 @@ const PhoneOverlay = React.memo(function PhoneOverlay() {
   return <div className="phone-overlay"></div>;
 });
 
-const AppShell = ({ children }) => (
+const AppShell = ({ children, onSOS }) => (
   <div className="app-shell">
     <div className="phone-frame">
       <MovingBackground />
       <PhoneOverlay />
+      {onSOS && (
+        <button className="sos-btn" onClick={onSOS} title="Emergency Contacts">
+          !
+        </button>
+      )}
       <div className="phone-content">
         {children}
       </div>
@@ -169,14 +174,23 @@ function App() {
         <h2>Daily Tracker</h2>
 
         <div className="last-log-wide">
-          <h3>YESTERDAY</h3>
+          <p style={{ margin: "0 0 8px 0", fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "#8a6f5a", fontWeight: "700" }}>Yesterday</p>
           {displayLog ? (
-            <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginTop: "6px" }}>
-              <div><div style={{ fontSize: "11px", color: "#8a6f5a" }}>Mood</div><div style={{ fontSize: "22px", fontWeight: "700", color: "#3f3732" }}>{displayLog.mood}</div></div>
-              <div><div style={{ fontSize: "11px", color: "#8a6f5a" }}>Sleep</div><div style={{ fontSize: "22px", fontWeight: "700", color: "#3f3732" }}>{displayLog.hours_slept != null ? displayLog.hours_slept : displayLog.sleep}h</div></div>
+            <div style={{ display: "flex", justifyContent: "center", gap: "28px" }}>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "10px", color: "#8a6f5a", marginBottom: "2px" }}>Mood</div>
+                <div style={{ fontSize: "24px", fontWeight: "800", color: "#3f3732", lineHeight: 1 }}>{displayLog.mood}</div>
+                <div style={{ fontSize: "10px", color: "#8a6f5a" }}>/ 5</div>
+              </div>
+              <div style={{ width: "1px", background: "rgba(120,95,70,0.15)", borderRadius: "1px" }} />
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "10px", color: "#8a6f5a", marginBottom: "2px" }}>Sleep</div>
+                <div style={{ fontSize: "24px", fontWeight: "800", color: "#3f3732", lineHeight: 1 }}>{displayLog.hours_slept != null ? displayLog.hours_slept : displayLog.sleep}</div>
+                <div style={{ fontSize: "10px", color: "#8a6f5a" }}>hrs</div>
+              </div>
             </div>
           ) : (
-            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#8a6f5a" }}>No previous log.</p>
+            <p style={{ margin: 0, fontSize: "13px", color: "#8a6f5a" }}>No previous log yet.</p>
           )}
         </div>
 
@@ -224,43 +238,51 @@ function App() {
       combinedAlert = "Low mood and poor sleep together can feel overwhelming. Please don't face this alone — talk to someone or contact your health visitor.";
     }
 
+    const moodEmoji = lowMood ? "😔" : okMood ? "😐" : "😊";
+    const sleepEmoji = lowSleep ? "😩" : okSleep ? "😴" : "🌙";
+    const moodLabel = lowMood ? "Low" : okMood ? "Okay" : "Good";
+    const sleepLabel = lowSleep ? "Very Low" : okSleep ? "Below Ideal" : "Good";
+
     return (
       <div className="container">
-        <h2>Daily Summary</h2>
+        <div className="support-hero" style={{ marginBottom: "14px" }}>
+          <div className="support-hero-icon">{moodEmoji}</div>
+          <h2>Daily Summary</h2>
+          <p className="support-hero-sub">Here's how today is looking for you.</p>
+        </div>
 
-        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
-          <div style={{
-            flex: 1, borderRadius: "8px", padding: "10px", textAlign: "center",
-            background: lowMood ? "#f5c4c4" : okMood ? "#f5e6b0" : "#b8dfc0"
-          }}>
-            <div style={{ fontSize: "11px", color: "#555" }}>Mood</div>
-            <div style={{ fontSize: "28px", fontWeight: "bold" }}>{mood}</div>
-            <div style={{ fontSize: "10px", color: "#555" }}>out of 5</div>
+        <div style={{ display: "flex", gap: "10px", marginBottom: "14px" }}>
+          <div style={{ flex: 1, borderRadius: "16px", padding: "16px 10px", textAlign: "center", background: lowMood ? "#f5c4c4" : okMood ? "#f5e6b0" : "#b8dfc0", backdropFilter: "blur(6px)" }}>
+            <div style={{ fontSize: "28px", marginBottom: "4px" }}>🧠</div>
+            <div style={{ fontSize: "22px", fontWeight: "800", color: "#3f3732" }}>{mood}<span style={{ fontSize: "13px", fontWeight: "500" }}>/5</span></div>
+            <div style={{ fontSize: "11px", color: "#7a6555", marginTop: "2px" }}>Mood · {moodLabel}</div>
           </div>
-          <div style={{
-            flex: 1, borderRadius: "8px", padding: "10px", textAlign: "center",
-            background: lowSleep ? "#f5c4c4" : okSleep ? "#f5e6b0" : "#b8dfc0"
-          }}>
-            <div style={{ fontSize: "11px", color: "#555" }}>Sleep</div>
-            <div style={{ fontSize: "28px", fontWeight: "bold" }}>{sleep}h</div>
-            <div style={{ fontSize: "10px", color: "#555" }}>last night</div>
+          <div style={{ flex: 1, borderRadius: "16px", padding: "16px 10px", textAlign: "center", background: lowSleep ? "#f5c4c4" : okSleep ? "#f5e6b0" : "#b8dfc0", backdropFilter: "blur(6px)" }}>
+            <div style={{ fontSize: "28px", marginBottom: "4px" }}>😴</div>
+            <div style={{ fontSize: "22px", fontWeight: "800", color: "#3f3732" }}>{sleep}<span style={{ fontSize: "13px", fontWeight: "500" }}>h</span></div>
+            <div style={{ fontSize: "11px", color: "#7a6555", marginTop: "2px" }}>Sleep · {sleepLabel}</div>
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.3)", backdropFilter: "blur(8px)", borderRadius: "14px", padding: "15px", textAlign: "left", marginBottom: "12px", border: "1.5px solid rgba(120,95,70,0.1)" }}>
-          <p style={{ fontSize: "14px", color: "#4b4038", marginBottom: "10px" }}>
-            🧠 <strong>Mood:</strong> {moodMessage}
-          </p>
-          <p style={{ fontSize: "14px", color: "#4b4038", margin: 0 }}>
-            😴 <strong>Sleep:</strong> {sleepMessage}
-          </p>
+        <div style={{ background: "rgba(255,255,255,0.3)", backdropFilter: "blur(8px)", borderRadius: "16px", padding: "16px", textAlign: "left", marginBottom: "10px", border: "1.5px solid rgba(120,95,70,0.1)" }}>
+          <p style={{ fontSize: "13px", color: "#3f3732", fontWeight: "700", marginBottom: "6px", marginTop: 0 }}>🧠 Mood</p>
+          <p style={{ fontSize: "13px", color: "#4b4038", margin: "0 0 14px 0", lineHeight: "1.5" }}>{moodMessage}</p>
+          <p style={{ fontSize: "13px", color: "#3f3732", fontWeight: "700", marginBottom: "6px", marginTop: 0 }}>😴 Sleep</p>
+          <p style={{ fontSize: "13px", color: "#4b4038", margin: 0, lineHeight: "1.5" }}>{sleepMessage}</p>
         </div>
 
         {combinedAlert && (
-          <div className="alert">{combinedAlert}</div>
+          <div className="article-callout alert-red" style={{ marginBottom: "10px" }}>
+            ⚠️ {combinedAlert}
+          </div>
         )}
 
-        <button className="main-btn" onClick={() => setPage("home")}>Go Back Home</button>
+        <div style={{ background: "rgba(255,255,255,0.22)", borderRadius: "16px", padding: "14px 16px", marginBottom: "14px", border: "1.5px solid rgba(120,95,70,0.08)", textAlign: "left" }}>
+          <p style={{ fontSize: "12px", color: "#8a6f5a", fontWeight: "700", margin: "0 0 4px 0", textTransform: "uppercase", letterSpacing: "0.5px" }}>A gentle reminder</p>
+          <p style={{ fontSize: "13px", color: "#4b4038", margin: 0, lineHeight: "1.5" }}>Every day is different. Be kind to yourself — you're doing better than you think. 💜</p>
+        </div>
+
+        <button className="main-btn" style={{ width: "100%" }} onClick={() => setPage("home")}>Back to Home</button>
       </div>
     );
   };
@@ -391,7 +413,8 @@ function App() {
             <span style={{ background: "#f5c4c4", padding: "2px 8px", borderRadius: "4px", fontSize: "11px" }}>Low</span>
             <span style={{ background: "rgba(255,255,255,0.4)", padding: "2px 8px", borderRadius: "4px", fontSize: "11px", border: "1px solid rgba(120,95,70,0.15)" }}>No data</span>
           </div>
-          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+          <div style={{ height: "16px" }} />
+          <button className="main-btn" style={{ width: "100%" }} onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
@@ -434,7 +457,8 @@ function App() {
             <span><span style={{ color: "#c9a889", fontWeight: "bold" }}>●</span> Mood</span>
             <span><span style={{ color: "#34d399", fontWeight: "bold" }}>●</span> Sleep</span>
           </div>
-          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+          <div style={{ height: "16px" }} />
+          <button className="main-btn" style={{ width: "100%" }} onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
@@ -480,23 +504,24 @@ function App() {
                   <div style={{ fontSize: "26px", fontWeight: "bold" }}>{avgSleep}</div>
                   <div style={{ fontSize: "10px", color: "#555" }}>hours</div>
                 </div>
-                <div style={{ flex: 1, background: "#e9d5ff", borderRadius: "8px", padding: "10px", textAlign: "center" }}>
+                <div style={{ flex: 1, background: "rgba(201,168,137,0.2)", borderRadius: "12px", padding: "10px", textAlign: "center" }}>
                   <div style={{ fontSize: "11px", color: "#555" }}>Days Logged</div>
                   <div style={{ fontSize: "26px", fontWeight: "bold" }}>{monthEntries.length}</div>
                   <div style={{ fontSize: "10px", color: "#555" }}>this month</div>
                 </div>
               </div>
-              <div style={{ background: "#f5f3ff", borderRadius: "10px", padding: "15px", textAlign: "left" }}>
-                <p style={{ fontSize: "14px", color: "#444", marginBottom: "12px" }}>
+              <div style={{ background: "rgba(255,255,255,0.3)", backdropFilter: "blur(8px)", borderRadius: "14px", padding: "15px", textAlign: "left", border: "1.5px solid rgba(120,95,70,0.1)" }}>
+                <p style={{ fontSize: "14px", color: "#4b4038", marginBottom: "12px" }}>
                   🧠 <strong>Mood:</strong> {moodAdvice}
                 </p>
-                <p style={{ fontSize: "14px", color: "#444", margin: 0 }}>
+                <p style={{ fontSize: "14px", color: "#4b4038", margin: 0 }}>
                   😴 <strong>Sleep:</strong> {sleepAdvice}
                 </p>
               </div>
             </>
           )}
-          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+          <div style={{ height: "16px" }} />
+          <button className="main-btn" style={{ width: "100%" }} onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
@@ -737,54 +762,62 @@ function App() {
               <button className="main-btn" onClick={() => setView("new")}>Start a conversation</button>
             </div>
           ) : (
-            <div className="posts-list">
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
               {posts.map(post => {
                 const isOwn = post.username === user;
                 const replyCount = post.replies?.length || 0;
                 return (
-                  <div key={post.id} className={`post-card ${isOwn ? "post-card--own" : ""}`}>
-                    <div className="post-card-header">
+                  <div key={post.id} style={{
+                    background: isOwn ? "rgba(201,168,137,0.18)" : "rgba(255,255,255,0.26)",
+                    borderRadius: "16px",
+                    padding: "14px",
+                    border: "1.5px solid rgba(120,95,70,0.1)",
+                    backdropFilter: "blur(8px)"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                       <div className="post-avatar">{getInitial(post.username)}</div>
-                      <div className="post-meta">
-                        <span className="post-username">{isOwn ? "You" : post.username}</span>
-                        {isOwn && <span className="post-own-badge">your post</span>}
-                      </div>
+                      <span style={{ fontSize: "13px", fontWeight: "700", color: "#3f3732", flex: 1 }}>
+                        {isOwn ? "You" : post.username}
+                        {isOwn && <span className="post-own-badge" style={{ marginLeft: "6px" }}>your post</span>}
+                      </span>
                       {isOwn && (
-                        <button
-                          className="post-delete-btn"
-                          onClick={() => handleDeletePost(post.id)}
-                          title="Delete post"
-                        >✕</button>
+                        <button className="post-delete-btn" onClick={() => handleDeletePost(post.id)}>✕</button>
                       )}
                     </div>
 
-                    <p className="post-content">{post.content}</p>
+                    <p style={{ fontSize: "14px", color: "#4b4038", margin: "0 0 10px 0", lineHeight: "1.5" }}>{post.content}</p>
 
-                    <button
-                      className="replies-toggle"
-                      onClick={() => setShowReplies({ ...showReplies, [post.id]: !showReplies[post.id] })}
-                    >
-                      {showReplies[post.id]
-                        ? "Hide replies"
-                        : `💬 ${replyCount} ${replyCount === 1 ? "reply" : "replies"}`}
+                    <button className="main-btn" style={{ fontSize: "12px", padding: "7px 14px", marginTop: 0 }}
+                      onClick={() => setShowReplies({ ...showReplies, [post.id]: !showReplies[post.id] })}>
+                      {showReplies[post.id] ? "Hide replies" : `💬 ${replyCount} ${replyCount === 1 ? "reply" : "replies"}`}
                     </button>
 
                     {showReplies[post.id] && (
-                      <div className="replies-section">
+                      <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px solid rgba(120,95,70,0.1)" }}>
                         {replyCount === 0 && (
-                          <p className="no-replies">No replies yet — be the first to respond 💜</p>
+                          <p style={{ fontSize: "12px", color: "#aaa", fontStyle: "italic", margin: "0 0 8px 0" }}>No replies yet — be the first 💜</p>
                         )}
                         {post.replies?.map((r, i) => (
-                          <div key={i} className={`reply-bubble ${r.username === user ? "reply-bubble--own" : ""}`}>
-                            <span className="reply-avatar">{getInitial(r.username)}</span>
-                            <div className="reply-body">
-                              <span className="reply-username">{r.username === user ? "You" : r.username}</span>
-                              <p className="reply-content">{r.content}</p>
-                            </div>
+                          <div key={i} style={{
+                            marginBottom: "6px",
+                            textAlign: r.username === user ? "right" : "left"
+                          }}>
+                            <span style={{ fontSize: "10px", color: "#8a6f5a", fontWeight: "700", display: "block", marginBottom: "2px" }}>
+                              {r.username === user ? "You" : r.username}
+                            </span>
+                            <span style={{
+                              display: "inline-block",
+                              background: r.username === user ? "rgba(201,168,137,0.25)" : "rgba(255,255,255,0.4)",
+                              borderRadius: "10px",
+                              padding: "6px 10px",
+                              fontSize: "13px",
+                              color: "#4b4038",
+                              maxWidth: "80%",
+                              textAlign: "left"
+                            }}>{r.content}</span>
                           </div>
                         ))}
-
-                        <div className="reply-input-row">
+                        <div style={{ display: "flex", gap: "6px", marginTop: "8px", alignItems: "center" }}>
                           <input
                             type="text"
                             className="reply-input"
@@ -793,10 +826,7 @@ function App() {
                             onChange={(e) => setReplyText({ ...replyText, [post.id]: e.target.value })}
                             onKeyDown={(e) => e.key === "Enter" && handleReplySubmit(post.id)}
                           />
-                          <button
-                            className="reply-send-btn"
-                            onClick={() => handleReplySubmit(post.id)}
-                          >↑</button>
+                          <button className="reply-send-btn" onClick={() => handleReplySubmit(post.id)}>↑</button>
                         </div>
                       </div>
                     )}
@@ -984,7 +1014,8 @@ function App() {
               <ExternalLink href="https://www.unicef.org/parenting/mental-health/what-postpartum-depression">UNICEF — What is Postpartum Depression?</ExternalLink>
               <ExternalLink href="https://www.rcpsych.ac.uk/mental-health/problems-disorders/post-natal-depression">Royal College of Psychiatrists — PND</ExternalLink>
             </div>
-            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+            <div style={{ height: "16px" }} />
+            <button className="main-btn" style={{ width: "100%" }} onClick={() => setView("menu")}>← Back to Articles</button>
           </div>
         </div>
       );
@@ -1030,7 +1061,8 @@ function App() {
               <ExternalLink href="https://www.acog.org/womens-health/faqs/postpartum-depression">American College of Obstetricians &amp; Gynecologists</ExternalLink>
               <ExternalLink href="https://www.psychiatry.org/patients-families/peripartum-depression/what-is-peripartum-depression">American Psychiatric Association — Perinatal Depression</ExternalLink>
             </div>
-            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+            <div style={{ height: "16px" }} />
+            <button className="main-btn" style={{ width: "100%" }} onClick={() => setView("menu")}>← Back to Articles</button>
           </div>
         </div>
       );
@@ -1078,7 +1110,8 @@ function App() {
               <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/treatment/">NHS — Treatment for Postnatal Depression</ExternalLink>
               <ExternalLink href="https://www.mind.org.uk/information-support/types-of-mental-health-problems/postnatal-depression-and-perinatal-mental-health/">Mind — Postnatal Depression Support</ExternalLink>
             </div>
-            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+            <div style={{ height: "16px" }} />
+            <button className="main-btn" style={{ width: "100%" }} onClick={() => setView("menu")}>← Back to Articles</button>
           </div>
         </div>
       );
@@ -1127,7 +1160,8 @@ function App() {
               <ExternalLink href="https://www.pandasfoundation.org.uk/stories/">PANDAS Foundation — Real Stories</ExternalLink>
               <ExternalLink href="https://apni.org/">Association for Post Natal Illness — Personal Experiences</ExternalLink>
             </div>
-            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+            <div style={{ height: "16px" }} />
+            <button className="main-btn" style={{ width: "100%" }} onClick={() => setView("menu")}>← Back to Articles</button>
           </div>
         </div>
       );
@@ -1169,7 +1203,8 @@ function App() {
               <ExternalLink href="https://www.mind.org.uk/information-support/types-of-mental-health-problems/postnatal-depression-and-perinatal-mental-health/">Mind UK — Perinatal Mental Health</ExternalLink>
               <ExternalLink href="https://www.nhsinform.scot/illnesses-and-conditions/mental-health/postnatal-depression/">NHS Inform — Postnatal Depression</ExternalLink>
             </div>
-            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+            <div style={{ height: "16px" }} />
+            <button className="main-btn" style={{ width: "100%" }} onClick={() => setView("menu")}>← Back to Articles</button>
           </div>
         </div>
       );
@@ -1209,7 +1244,8 @@ function App() {
               <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/overview/">NHS — Postnatal Depression</ExternalLink>
               <ExternalLink href="https://maternalmentalhealthalliance.org/campaign/help/">Maternal Mental Health Alliance — Get Help</ExternalLink>
             </div>
-            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+            <div style={{ height: "16px" }} />
+            <button className="main-btn" style={{ width: "100%" }} onClick={() => setView("menu")}>← Back to Articles</button>
           </div>
         </div>
       );
@@ -1223,36 +1259,44 @@ function App() {
     return (
       <AppShell>
         <div className="container auth-screen">
-          <BrandLogo compact />
+          <BrandLogo />
+          <p style={{ fontSize: "13px", color: "#8a6f5a", margin: "0 0 20px 0", textAlign: "center", lineHeight: "1.5" }}>
+            A safe space for mothers, by mothers.
+          </p>
           <div className="auth-toggle">
-            <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.45 }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>
-            <button className="main-btn" style={{ opacity: authMode === "register" ? 1 : 0.45 }} onClick={() => { setAuthMode("register"); setLoginError(""); }}>Register</button>
+            <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.4, minWidth: "110px" }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>
+            <button className="main-btn" style={{ opacity: authMode === "register" ? 1 : 0.4, minWidth: "110px" }} onClick={() => { setAuthMode("register"); setLoginError(""); }}>Register</button>
           </div>
-          <p className="field-label">Username</p>
-          <input className="auth-input" placeholder="Username..." value={inputName} onChange={(e) => { setInputName(e.target.value); setLoginError(""); }} />
-          <p className="field-label">Password</p>
-          <input className="auth-input" type="password" placeholder="Password..." value={inputPassword} onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }} />
-          {loginError && <p className="error-text">{loginError}</p>}
-          <button className="main-btn" onClick={handleLogin}>
+          <div style={{ width: "100%", maxWidth: "280px", margin: "0 auto" }}>
+            <p className="field-label" style={{ textAlign: "left", fontSize: "12px", color: "#8a6f5a", fontWeight: "600", marginBottom: "4px" }}>Username</p>
+            <input className="auth-input" style={{ width: "100%", marginBottom: "12px" }} placeholder="Enter your username..." value={inputName} onChange={(e) => { setInputName(e.target.value); setLoginError(""); }} />
+            <p className="field-label" style={{ textAlign: "left", fontSize: "12px", color: "#8a6f5a", fontWeight: "600", marginBottom: "4px" }}>Password</p>
+            <input className="auth-input" style={{ width: "100%", marginBottom: "4px" }} type="password" placeholder="Enter your password..." value={inputPassword} onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }} />
+          </div>
+          {loginError && <p className="error-text" style={{ marginTop: "6px" }}>{loginError}</p>}
+          <button className="main-btn" style={{ marginTop: "16px", minWidth: "160px" }} onClick={handleLogin}>
             {authMode === "login" ? "Login" : "Create Account"}
           </button>
+          <p style={{ fontSize: "11px", color: "#aaa", marginTop: "20px", textAlign: "center", lineHeight: "1.5" }}>
+            Your data is private and secure.
+          </p>
         </div>
       </AppShell>
     );
   }
 
   // ---------------- PAGE ROUTING ----------------
-  if (page === "daily") return <AppShell><DailyTracker /></AppShell>;
-  if (page === "dailyResult") return <AppShell><DailyResult /></AppShell>;
-  if (page === "monthly") return <AppShell><MonthlyCheckin /></AppShell>;
-  if (page === "calendar") return <AppShell><CalendarPage /></AppShell>;
-  if (page === "support") return <AppShell><SupportGroup /></AppShell>;
+  if (page === "daily") return <AppShell onSOS={() => setPage("emergency")}><DailyTracker /></AppShell>;
+  if (page === "dailyResult") return <AppShell onSOS={() => setPage("emergency")}><DailyResult /></AppShell>;
+  if (page === "monthly") return <AppShell onSOS={() => setPage("emergency")}><MonthlyCheckin /></AppShell>;
+  if (page === "calendar") return <AppShell onSOS={() => setPage("emergency")}><CalendarPage /></AppShell>;
+  if (page === "support") return <AppShell onSOS={() => setPage("emergency")}><SupportGroup /></AppShell>;
   if (page === "emergency") return <AppShell><EmergencyContacts /></AppShell>;
-  if (page === "info") return <AppShell><Information /></AppShell>;
+  if (page === "info") return <AppShell onSOS={() => setPage("emergency")}><Information /></AppShell>;
 
   // ---------------- HOME PAGE ----------------
   return (
-    <AppShell>
+    <AppShell onSOS={() => setPage("emergency")}>
       <div className="container home-screen">
         <BrandLogo />
         <p className="hello-text">Hi, {user} 👋</p>

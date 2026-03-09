@@ -582,10 +582,7 @@ button {
       drop-shadow(0 16px 24px rgba(94, 79, 65, 0.10));
   }
 }
-/* ===================================================
-   SUPPORT GROUP — merged from old branch
-   Uses warm beige palette to match app shell
-   =================================================== */
+/* ===== SUPPORT GROUP ===== */
 
 .support-hero {
   margin-bottom: 20px;
@@ -964,10 +961,7 @@ button {
   margin-bottom: 20px;
 }
 
-/* ===================================================
-   ARTICLE / INFORMATION — merged from old branch
-   Adapted to warm beige palette
-   =================================================== */
+/* ===== ARTICLE / INFORMATION ===== */
 
 .article-card {
   background: rgba(255, 255, 255, 0.26);
@@ -1178,8 +1172,9 @@ button {
   margin-bottom: 6px;
 }
 
+/* ===== LAYOUT & BUTTON FIXES ===== */
 
-/* Back link */
+/* Back link — no box, just a clean text arrow */
 .back-link {
   background: none !important;
   border: none !important;
@@ -1202,7 +1197,7 @@ button {
   transform: none !important;
 }
 
-/* Last log card */
+/* Last log card — stacked, not side by side */
 .last-log-wide {
   background: rgba(255, 255, 255, 0.28) !important;
   border: 1.5px solid rgba(120, 95, 70, 0.12) !important;
@@ -1222,22 +1217,51 @@ button {
   text-transform: uppercase !important;
 }
 
-/* Main btn spacing to prevent collisions */
+/* Main btn spacing — prevent collisions */
 .main-btn + .main-btn {
   margin-top: 10px;
 }
 
-/* Option buttons active state  */
+/* Option buttons active state — warm not purple */
 .option-btn.active {
   background: linear-gradient(135deg, #c9a889, #b88f6e) !important;
   color: white !important;
   border-color: transparent !important;
 }
 
-/* Summary stat boxes */
+/* Summary stat boxes — consistent with palette */
 .stat-card {
   flex: 1;
   border-radius: 12px;
   padding: 12px 10px;
   text-align: center;
+}
+
+/* ===== SOS EMERGENCY BUTTON ===== */
+.sos-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #e07070, #c95555);
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(200, 80, 80, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  line-height: 1;
+}
+
+.sos-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(200, 80, 80, 0.45);
+  opacity: 1;
 }
