@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+
 
 function App() {
-
+  // ---------- GLOBAL STATES ----------
   const [user, setUser] = useState(() => localStorage.getItem("currentUser") || null);
   const [inputName, setInputName] = useState("");
   const [inputPassword, setInputPassword] = useState("");
@@ -14,34 +13,47 @@ function App() {
   const [sleep, setSleep] = useState(null);
   const [lastLog, setLastLog] = useState(null);
 
-  const handleLogin = () => {
+  // ---------------- LOGIN / REGISTER ----------------
+  const handleLogin = async () => {
     const name = inputName.trim();
     const pass = inputPassword.trim();
     if (!name || !pass) {
       setLoginError("Please enter both a username and password.");
       return;
     }
-    const storedPassword = localStorage.getItem(`${name}_password`);
 
-    if (authMode === "register") {
-      if (storedPassword) {
-        setLoginError("That username is already taken. Please log in.");
-        return;
+    try {
+      const response = await fetch("/users");
+      const users = await response.json();
+      const existingUser = users.find(u => u.username === name);
+
+      if (authMode === "register") {
+        if (existingUser) {
+          setLoginError("That username is already taken. Please log in.");
+          return;
+        }
+        await fetch("/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: name, password: pass }),
+        });
+        localStorage.setItem("currentUser", name);
+        setUser(name);
+      } else {
+        if (!existingUser) {
+          setLoginError("No account found. Please register first.");
+          return;
+        }
+        if (existingUser.password !== pass) {
+          setLoginError("Incorrect password.");
+          return;
+        }
+        localStorage.setItem("currentUser", name);
+        setUser(name);
       }
-      localStorage.setItem(`${name}_password`, pass);
-      localStorage.setItem("currentUser", name);
-      setUser(name);
-    } else {
-      if (!storedPassword) {
-        setLoginError("No account found. Please register first.");
-        return;
-      }
-      if (storedPassword !== pass) {
-        setLoginError("Incorrect password.");
-        return;
-      }
-      localStorage.setItem("currentUser", name);
-      setUser(name);
+    } catch (err) {
+      console.error(err);
+      setLoginError("Error connecting to server.");
     }
   };
 
@@ -54,20 +66,29 @@ function App() {
     setUser(null);
   };
 
+  // ---------------- LOAD LAST LOG ----------------
   useEffect(() => {
     if (!user) return;
-    setLastLog(null);
-    const saved = localStorage.getItem(`${user}_dailyLog`);
-    if (saved) {
-      setLastLog(JSON.parse(saved));
-    }
+    const loadLastLog = async () => {
+      try {
+        const response = await fetch("/tracker");
+        const logs = await response.json();
+        const userLogs = logs.filter(log => log.username === user);
+        if (userLogs.length > 0) setLastLog(userLogs[0]);
+        else setLastLog(null);
+      } catch (err) {
+        console.error(err);
+        setLastLog(null);
+      }
+    };
+    loadLastLog();
   }, [user]);
 
+  // ---------------- LOGIN SCREEN ----------------
   if (!user) {
     return (
       <div className="container">
         <h1 className="app-title">AFTER 9</h1>
-
         <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
           <button
             className="main-btn"
@@ -84,113 +105,175 @@ function App() {
             Register
           </button>
         </div>
-
-        <p style={{ marginBottom: "5px" }}>Username</p>
+        <p>Username</p>
         <input
           placeholder="Username..."
           value={inputName}
           onChange={(e) => { setInputName(e.target.value); setLoginError(""); }}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
         />
-        <p style={{ marginBottom: "5px" }}>Password</p>
+        <p>Password</p>
         <input
           type="password"
           placeholder="Password..."
           value={inputPassword}
           onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ddd6fe", width: "80%", marginBottom: "10px" }}
         />
-        {loginError && <p style={{ color: "#991b1b", fontSize: "13px" }}>{loginError}</p>}
+        {loginError && <p style={{ color: "red" }}>{loginError}</p>}
         <button className="main-btn" onClick={handleLogin}>
           {authMode === "login" ? "Login" : "Create Account"}
         </button>
       </div>
     );
   }
+  if (page === "daily") return <DailyTracker />;
+  if (page === "dailyResult") return <DailyResult />;
+  if (page === "monthly") return <MonthlyCheckin />;
+  if (page === "calendar") return <CalendarPage />;
+  if (page === "support") return <SupportGroup />;
+  if (page === "emergency") return <EmergencyContacts />;
+  if (page === "info") return <Information />;
+  if (page === "home") {
+  return (
+    <div className="container">
+      <h1>Welcome, {user}!</h1>
+      <div className="vertical-options">
+        <button className="main-btn" onClick={() => setPage("daily")}>Daily Tracker</button>
+        <button className="main-btn" onClick={() => setPage("monthly")}>Monthly Check-In</button>
+        <button className="main-btn" onClick={() => setPage("calendar")}>Calendar</button>
+        <button className="main-btn" onClick={() => setPage("support")}>Support Group</button>
+        <button className="main-btn" onClick={() => setPage("emergency")}>Emergency Contacts</button>
+        <button className="main-btn" onClick={() => setPage("info")}>Information</button>
+        <button className="main-btn" onClick={handleLogout}>Logout</button>
+      </div>
+    </div>
+  );
+}
 
-    // ---------- DAILY TRACKER ----------
-    const DailyTracker = () => {
+  // ================== CHILD COMPONENTS ==================
 
-      const handleSubmit = () => {
-        if (!mood || !sleep) return;
+  const DailyTracker = () => {
+    const [localMood, setLocalMood] = useState(null);
+    const [localSleep, setLocalSleep] = useState(null);
+    const [localLastLog, setLocalLastLog] = useState(JSON.parse(localStorage.getItem(`${user}_dailyLog`)) || null);
 
-        const log = {
-          mood,
-          sleep,
-          date: new Date().toLocaleDateString()
-        };
-      
+    const handleSubmit = async () => {
+      if (!localMood || !localSleep) return;
+      const log = { mood: localMood, sleep: localSleep, date: new Date().toLocaleDateString() };
       localStorage.setItem(`${user}_dailyLog`, JSON.stringify(log));
-      setLastLog(log);
+      setLocalLastLog(log);
 
-      const key = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
+      const key = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`;
       const allLogs = JSON.parse(localStorage.getItem(`${user}_allLogs`) || "{}");
-      allLogs[key] = { mood, sleep };
+      allLogs[key] = { mood: localMood, sleep: localSleep };
       localStorage.setItem(`${user}_allLogs`, JSON.stringify(allLogs));
 
+      setMood(localMood);
+      setSleep(localSleep);
       setPage("dailyResult");
 
-      };
+      try {
+        await fetch("/tracker", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, mood: localMood, hoursSlept: localSleep }),
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-      return (
+    return (
       <div className="container">
-
-        {/* YESTERDAY */}
-        <div className="last-log-wide">
-          <h3>YESTERDAY</h3>
-
-          {lastLog ? (
-            <>
-              <p><strong>Mood:</strong> {lastLog.mood}</p>
-              <p><strong>Sleep:</strong> {lastLog.sleep} hrs</p>
-            </>
-          ) : (
-            <p>No previous log.</p>
-          )}
-        </div>
-
         <h2>Daily Tracker</h2>
-
-        <p>Mood today (1 = very low, 5 = very good)</p>
-
-        <div className="button-group">
-          {[1,2,3,4,5].map(num => (
-            <button
-              key={num}
-              className={mood === num ? "active" : ""}
-              onClick={() => setMood(num)}
-            >
-              {num}
-            </button>
-          ))}
-        </div>
-
+        {localLastLog ? (
+          <>
+            <p>Yesterday's Mood: {localLastLog.mood}</p>
+            <p>Yesterday's Sleep: {localLastLog.sleep} hrs</p>
+          </>
+        ) : <p>No previous log.</p>}
+        <p>Mood today (1-5)</p>
+        {[1,2,3,4,5].map(n => (
+          <button key={n} className={localMood===n?"active":""} onClick={()=>setLocalMood(n)}>{n}</button>
+        ))}
         <p>Hours of sleep last night</p>
-
-        <div className="button-group">
-          {[1,2,3,4,5,6,7,8].map(num => (
-            <button
-              key={num}
-              className={sleep === num ? "active" : ""}
-              onClick={() => setSleep(num)}
-            >
-              {num}
-            </button>
-          ))}
-        </div>
-
-        <button className="main-btn" onClick={handleSubmit}>
-          Submit
-        </button>
-
-        <br /><br />
-
-        <button className="main-btn" onClick={() => setPage("home")}>
-          Back to Home
-        </button>
-
+        {[1,2,3,4,5,6,7,8].map(n => (
+          <button key={n} className={localSleep===n?"active":""} onClick={()=>setLocalSleep(n)}>{n}</button>
+        ))}
+        <button className="main-btn" onClick={handleSubmit}>Submit</button>
+        <button className="main-btn" onClick={()=>setPage("home")}>Back to Home</button>
       </div>
     );
+  };
+
+  const DailyResult = () => {
+    let message = mood <= 2 ? "You seem a bit low today, reach out to someone." :
+                  mood === 3 ? "Your mood is ok, do something to cheer yourself up." :
+                  "Good job, keep going!";
+    return (
+      <div className="container">
+        <h2>Daily Summary</h2>
+        <div className="alert">{message}</div>
+        <button className="main-btn" onClick={()=>setPage("home")}>Go Back Home</button>
+      </div>
+    );
+  };
+
+
+  return (
+    <div className="container">
+      {/* YESTERDAY */}
+      <div className="last-log-wide">
+        <h3>YESTERDAY</h3>
+
+        {lastLog ? (
+          <>
+            <p><strong>Mood:</strong> {lastLog.mood}</p>
+            <p><strong>Sleep:</strong> {lastLog.sleep} hrs</p>
+          </>
+        ) : (
+          <p>No previous log.</p>
+        )}
+      </div>
+
+      <h2>Daily Tracker</h2>
+
+      <p>Mood today (1 = very low, 5 = very good)</p>
+      <div className="button-group">
+        {[1,2,3,4,5].map(num => (
+          <button
+            key={num}
+            className={mood === num ? "active" : ""}
+            onClick={() => setMood(num)}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
+
+      <p>Hours of sleep last night</p>
+      <div className="button-group">
+        {[1,2,3,4,5,6,7,8].map(num => (
+          <button
+            key={num}
+            className={sleep === num ? "active" : ""}
+            onClick={() => setSleep(num)}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
+
+      <button className="main-btn" onClick={handleSubmit}>
+        Submit
+      </button>
+
+      <br /><br />
+
+      <button className="main-btn" onClick={() => setPage("home")}>
+        Back to Home
+      </button>
+    </div>
+  );
     
   }
   // ---------- CALENDAR PAGE ----------
@@ -485,37 +568,7 @@ function App() {
       );
     }
   };
-    // ---------- DAILY RESULT ----------
-    const DailyResult = () => {
-      let message = "";
-
-      if (mood <= 2) {
-        message = "You seem a bit low today, why don't you reach out to someone.";
-      } 
-      else if (mood === 3) {
-        message = "Your mood is ok, do something to cheer yourself up.";
-      } 
-      else if (mood >= 4) {
-        message = "Good job, keep going!";
-      }
-
-      return (
-        <div className="container">
-
-          <h2>Daily Summary</h2>
-
-          <div className="alert">
-            {message}
-          </div>
-
-          <button className="main-btn" onClick={() => setPage("home")}>
-            Go Back Home
-          </button>
-
-        </div>
-      );
-    };
-
+  
     // ---------- MONTHLY CHECK-IN ----------
     const MonthlyCheckin = () => {
       const questions = [
@@ -704,78 +757,95 @@ function App() {
   
   // ---------- SUPPORT GROUP ----------
 const SupportGroup = () => {
-
   const [view, setView] = useState("menu");
-
   const [posts, setPosts] = useState([]);
+  const [newPost, setNewPost] = useState("");
+  const [replyText, setReplyText] = useState({});
   const [showReplies, setShowReplies] = useState({});
 
-  const [newPost, setNewPost] = useState("");
-
-
-  useEffect(() => {
-    fetch("/forum")
-      .then(res => res.json())
-      .then(data => setPosts(data));
-  }, []);
-
-
-  const handlePostSubmit = async () => {
-
-    if (!newPost.trim()) return;
-
-    const post = {
-      id: Date.now(),
-      content: newPost,
-      createdByUser: true
-
-    };
-
-    await fetch("/forum/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(post)
-    });
-
-    setPosts([ { ...post, replies: [] }, ...posts ]);
-    setNewPost("");
-
+  // Fetch posts on load
+  const loadPosts = async () => {
+    try {
+      const res = await fetch("/forum/posts");
+      const data = await res.json();
+      setPosts(data.reverse()); // newest first
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+    }
   };
 
+  useEffect(() => {
+    loadPosts();
+  }, []);
 
+  // ---------- NEW POST ----------
+  const handlePostSubmit = async () => {
+    if (!newPost.trim()) return;
 
-  // ---------- MAIN MENU ----------
+    try {
+      const res = await fetch("/forum/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: newPost, username: user })
+      });
+      const createdPost = await res.json();
+      setPosts([createdPost, ...posts]);
+      setNewPost("");
+      setView("existing");
+    } catch (err) {
+      console.error("Error creating post:", err);
+    }
+  };
+
+  // ---------- REPLY ----------
+  const handleReplySubmit = async (postId) => {
+    if (!replyText[postId]) return;
+
+    try {
+      const res = await fetch(`/forum/posts/${postId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: user, content: replyText[postId] })
+      });
+      const updatedReply = await res.json();
+
+      setPosts(posts.map(p =>
+        p.id === postId ? { ...p, replies: [...(p.replies || []), updatedReply] } : p
+      ));
+      setReplyText({ ...replyText, [postId]: "" });
+    } catch (err) {
+      console.error("Error submitting reply:", err);
+    }
+  };
+
+  // ---------- DELETE ----------
+  const handleDeletePost = async (postId) => {
+    try {
+      await fetch(`/forum/posts/${postId}`, { method: "DELETE" });
+      setPosts(posts.filter(p => p.id !== postId));
+    } catch (err) {
+      console.error("Error deleting post:", err);
+    }
+  };
+
+  // ---------- MENU ----------
   if (view === "menu") {
     return (
       <div className="container">
         <h2>Support Groups</h2>
-
-        <p>
-          Connect with other mothers, join conversations, or seek expert advice.
-        </p>
+        <p>Connect with other mothers, join conversations, or seek expert advice.</p>
 
         <div className="vertical-options">
-          <button className="main-btn" onClick={() => setView("new")}>
-            New Chat
-          </button>
-
-          <button className="main-btn" onClick={() => setView("existing")}>
-            Existing Chats
-          </button>
-
-          <button className="main-btn" onClick={() => setView("expert")}>
-            Ask an Expert
-          </button>
+          <button className="main-btn" onClick={() => setView("new")}>New Chat</button>
+          <button className="main-btn" onClick={() => setView("existing")}>Existing Chats</button>
+          <button className="main-btn" onClick={() => setView("expert")}>Ask an Expert</button>
         </div>
 
-        <button className="main-btn" onClick={() => setPage("home")}>
-          Back to Home
-        </button>
+        <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
       </div>
     );
   }
+
   // ---------- NEW CHAT ----------
   if (view === "new") {
     return (
@@ -789,163 +859,100 @@ const SupportGroup = () => {
           style={{ width: "100%", minHeight: "80px", marginTop: "10px" }}
         />
 
-        <button className="main-btn" onClick={handlePostSubmit}>
-          Post
-        </button>
-
-        <div className="vertical-options" style={{ marginTop: "20px" }}>
-          <button
-            className="main-btn"
-            onClick={() => setView("yourChats")}
-          >
-            Your Chats
-          </button>
-        </div>
-
-        <button className="main-btn" onClick={() => setView("menu")}>
-          Back
-        </button>
+        <button className="main-btn" onClick={handlePostSubmit}>Post</button>
+        <button className="main-btn" style={{ marginTop: "20px" }} onClick={() => setView("menu")}>Back</button>
       </div>
     );
   }
-    // ---------- EXISTING CHATS ----------
+
+  // ---------- EXISTING CHATS ----------
   if (view === "existing") {
     return (
       <div className="container">
         <h2>Existing Chats</h2>
-
         {posts.length === 0 && <p>No chats available yet.</p>}
 
+        {posts.map(post => (
+          <div key={post.id} className="post-box" style={{ background: post.username === user ? "#e0f2fe" : "#f5f5f5", padding: "10px", borderRadius: "8px", marginBottom: "12px" }}>
+            <p><strong>{post.username}:</strong> {post.content}</p>
 
-  {posts.map(post => (
-    <div key={post.id} className="post-box">
-
-      <p><strong>Anonymous:</strong> {post.content}</p>
-
-      <button
-        onClick={() =>
-          setShowReplies({
-            ...showReplies,
-            [post.id]: !showReplies[post.id]
-          })
-        }
-      >
-        Show Replies ({post.replies?.length || 0})
-      </button>
-
-      {showReplies[post.id] && (
-        <div style={{ marginTop: "10px" }}>
-
-          {post.replies?.map((r, i) => (
-            <p key={i}>↳ {r}</p>
-          ))}
-
-        </div>
-      )}
-
-      {/* DELETE BUTTON */}
-      <button
-        className="main-btn"
-        style={{ marginTop: "10px", background: "#f87171" }}
-        onClick={async () => {
-
-          await fetch(
-            `/forum/posts/${post.id}`,
-            { method: "DELETE" }
-          );
-
-          setPosts(posts.filter(p => p.id !== post.id));
-
-        }}
-      >
-        Delete Chat
-      </button>
-
-    </div>
-  ))}
-
-
-        <button className="main-btn" onClick={() => setView("menu")}>
-          Back
-        </button>
-      </div>
-    );
-  }
-
-  // ---------- YOUR CHATS ----------
-  if (view === "yourChats") {
-
-    const yourPosts = posts.filter(post => post.createdByUser);
-
-    return (
-      <div className="container">
-
-        <h2>Your Chats</h2>
-
-        {yourPosts.length === 0 && (
-          <p>You haven't created any chats yet.</p>
-        )}
-
-        {yourPosts.map(post => (
-          <div key={post.id} className="post-box">
-
-            <p>{post.content}</p>
-
-            <button
-              className="main-btn"
-              style={{ background: "#f87171", marginTop: "10px" }}
-              onClick={async () => {
-
-                await fetch(
-                  `/forum/posts/${post.id}`,
-                  { method: "DELETE" }
-                );
-
-                setPosts(posts.filter(p => p.id !== post.id));
-
-              }}
-            >
-              Delete Chat
+            <button onClick={() => setShowReplies({ ...showReplies, [post.id]: !showReplies[post.id] })}>
+              {showReplies[post.id] ? "Hide Replies" : `Show Replies (${post.replies?.length || 0})`}
             </button>
 
+            {showReplies[post.id] && (
+              <div style={{ marginTop: "10px" }}>
+                {post.replies?.map((r, i) => (
+                  <p key={i} style={{ marginLeft: "10px" }}>↳ <strong>{r.username}:</strong> {r.content}</p>
+                ))}
+
+                <input
+                  type="text"
+                  placeholder="Reply..."
+                  value={replyText[post.id] || ""}
+                  onChange={(e) => setReplyText({ ...replyText, [post.id]: e.target.value })}
+                  style={{ width: "80%", marginRight: "8px" }}
+                />
+                <button className="main-btn" onClick={() => handleReplySubmit(post.id)}>Reply</button>
+              </div>
+            )}
+
+            {post.username === user && (
+              <button className="main-btn" style={{ marginTop: "10px", background: "#f87171" }} onClick={() => handleDeletePost(post.id)}>Delete Chat</button>
+            )}
           </div>
         ))}
 
-        <button className="main-btn" onClick={() => setView("new")}>
-          Back
-        </button>
-
+        <button className="main-btn" onClick={() => setView("menu")}>Back</button>
       </div>
     );
   }
-   // ---------- ASK AN EXPERT ----------
+
+  // ---------- ASK AN EXPERT ----------
   if (view === "expert") {
+    const [expertMsg, setExpertMsg] = useState("");
+    const [submitted, setSubmitted] = useState(false);
+
+    const handleExpertSubmit = async () => {
+      if (!expertMsg.trim()) return;
+      try {
+        await fetch("/forum/experts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, content: expertMsg })
+        });
+        setSubmitted(true);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (submitted) return (
+      <div className="container">
+        <h2>Expert Question Submitted</h2>
+        <p>Your question has been sent to a qualified professional. You will be notified when they respond.</p>
+        <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+      </div>
+    );
+
     return (
       <div className="container">
         <h2>Ask an Expert</h2>
-
-        <p>
-          Submit your concern and a qualified health professional will respond.
-          This feature can later connect to real clinicians.
-        </p>
+        <p>Submit your concern and a qualified health professional will respond.</p>
 
         <textarea
           placeholder="Describe your concern..."
+          value={expertMsg}
+          onChange={(e) => setExpertMsg(e.target.value)}
           style={{ width: "100%", minHeight: "80px", marginTop: "10px" }}
         />
 
-        <button className="main-btn" style={{ marginTop: "15px" }}>
-          Submit to Expert
-        </button>
-
-        <button className="main-btn" onClick={() => setView("menu")}>
-          Back
-        </button>
+        <button className="main-btn" style={{ marginTop: "15px" }} onClick={handleExpertSubmit}>Submit to Expert</button>
+        <button className="main-btn" onClick={() => setView("menu")}>Back</button>
       </div>
     );
   }
 };
-
 
 
 // ---------- EMERGENCY CONTACTS ----------
@@ -1165,89 +1172,28 @@ const Information = () => {
 
 };
 
+  // ---------------- PAGE ROUTING ----------------
+  if (page === "daily") return <DailyTracker />;
+  if (page === "dailyResult") return <DailyResult />;
+  // TODO: Add other pages (MonthlyCheckin, CalendarPage, SupportGroup, Info, EmergencyContacts)
 
+  // ---------------- HOME PAGE ----------------
+  return (
+    <div className="container">
+      <h1 className="app-title">AFTER 9</h1>
+      <p>Welcome, {user}!</p>
 
-
-
-
-
-
-
-    // Add other code above this line as below it is the UI and we want to keep a clean structure
-
-
-
-
-
-
-
-    // ---------- PAGE ROUTING ----------
-    if (page === "daily") return <DailyTracker />;
-    if (page === "dailyResult") return <DailyResult />;
-    if (page === "weekly") return <MonthlyCheckin />;
-    if (page === "support") return <SupportGroup />;
-    if (page === "emergency") return <EmergencyContacts />;
-    if (page === "info") return <Information />;
-    if (page === "calendar") return <CalendarPage />;
-
-
-
-
-    // ---------- HOME ----------
-    return (
-      <div className="container">
-        <h1 className="app-title">AFTER 9</h1>
-        <p style={{ fontSize: "13px", color: "#888", marginBottom: "10px" }}>Hi, {user} 👋</p>
-
-        <div className="home-grid">
-
-          <div
-            className="home-card home-card-large"
-            onClick={() => setPage("daily")}
-          >
-            Daily Tracker
-          </div>
-
-          <div
-            className="home-card"
-            onClick={() => setPage("weekly")}
-          >
-            Monthly Check-In
-          </div>
-
-          <div
-            className="home-card"
-            onClick={() => setPage("support")}
-          >
-            Support Groups
-          </div>
-
-          <div
-            className="home-card"
-            onClick={() => setPage("emergency")}
-          >
-            Emergency Contacts
-          </div>
-
-          <div
-            className="home-card"
-            onClick={() => setPage("info")}
-          >
-            Information & Awareness
-          </div>
-            <div className="home-card" onClick={() => setPage("calendar")}>
-            Mood tracker
-          </div>
-        </div>
-
-        <button className="main-btn" onClick={handleLogout} style={{ marginTop: "20px" }}>
-          Log Out
-        </button>
-
+      <div className="vertical-options">
+        <button className="main-btn" onClick={()=>setPage("daily")}>Daily Tracker</button>
+        <button className="main-btn" onClick={()=>setPage("weekly")}>Monthly Check-In</button>
+        <button className="main-btn" onClick={()=>setPage("calendar")}>Calendar</button>
+        <button className="main-btn" onClick={()=>setPage("support")}>Support Group</button>
+        <button className="main-btn" onClick={()=>setPage("emergency")}>Emergency Contacts</button>
+        <button className="main-btn" onClick={()=>setPage("info")}>Information</button>
+        <button className="main-btn" onClick={handleLogout}>Logout</button>
       </div>
-    );
-    
-  
-}
-  
-  export default App;
+    </div>
+  );
+
+
+export default App;

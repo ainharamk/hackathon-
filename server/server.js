@@ -23,7 +23,7 @@ const db = mysql.createPool({
   port: Number(process.env.DB_PORT),
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
 });
 
 db.getConnection((err, connection) => {
@@ -35,36 +35,64 @@ db.getConnection((err, connection) => {
   connection.release();
 });
 
-// ---------- API ROUTES ----------
-
-// Health check
+// ---------- HEALTH CHECK ----------
 app.get("/health", (req, res) => {
   res.send("Server is running");
 });
 
-// Users
-app.get("/users", (req, res) => {
-  db.query("SELECT * FROM users", (err, results) => {
-    if (err) return res.status(500).send("Database error");
-    res.json(results);
-  });
+// ---------- USER AUTH ----------
+app.post("/users/register", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).send("Username and password required");
+
+  db.query(
+    "SELECT * FROM users WHERE username = ?",
+    [username],
+    (err, results) => {
+      if (err) return res.status(500).send("Database error");
+      if (results.length > 0) return res.status(400).send("Username taken");
+
+      db.query(
+        "INSERT INTO users (username, password) VALUES (?, ?)",
+        [username, password],
+        (err) => {
+          if (err) return res.status(500).send("Database error");
+          res.json({ message: "User registered", username });
+        }
+      );
+    }
+  );
 });
 
-// Daily stats
-app.post("/stats", (req, res) => {
-  const { page, action, value } = req.body;
-  const sql = "INSERT INTO daily_stats (page, action, value) VALUES (?, ?, ?)";
-  db.query(sql, [page, action, value], (err, result) => {
-    if (err) return res.status(500).send("Database error");
-    res.json({ message: "Stat saved", id: result.insertId });
-  });
+app.post("/users/login", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).send("Username and password required");
+
+  db.query(
+    "SELECT * FROM users WHERE username = ?",
+    [username],
+    (err, results) => {
+      if (err) return res.status(500).send("Database error");
+      if (results.length === 0) return res.status(400).send("User not found");
+      if (results[0].password !== password)
+        return res.status(400).send("Incorrect password");
+
+      res.json({ message: "Login successful", username });
+    }
+  );
 });
 
-// Daily tracker
+// ---------- DAILY TRACKER ----------
 app.post("/tracker", (req, res) => {
-  const { mood, hoursSlept } = req.body;
-  const sql = "INSERT INTO daily_tracker (mood, hours_slept) VALUES (?, ?)";
-  db.query(sql, [mood, hoursSlept], (err) => {
+  const { username, mood, hoursSlept } = req.body;
+  if (!username || !mood || hoursSlept == null)
+    return res.status(400).send("Missing fields");
+
+  const sql =
+    "INSERT INTO daily_tracker (username, mood, hours_slept) VALUES (?, ?, ?)";
+  db.query(sql, [username, mood, hoursSlept], (err) => {
     if (err) return res.status(500).send("Database error");
     res.json({ message: "Tracker saved" });
   });
@@ -80,30 +108,31 @@ app.get("/tracker", (req, res) => {
   );
 });
 
-// Forum posts
-app.post("/forum", (req, res) => {
-  const { username, message } = req.body;
-  const sql = "INSERT INTO forum_posts (username, message) VALUES (?, ?)";
-  db.query(sql, [username, message], (err) => {
+// ---------- FORUM POSTS & REPLIES ----------
+app.post("/forum/posts", (req, res) => {
+  const { username, content } = req.body;
+  if (!username || !content) return res.status(400).send("Missing fields");
+
+  const sql =
+    "INSERT INTO forum_posts (username, message, created_by_user) VALUES (?, ?, true)";
+  db.query(sql, [username, content], (err, result) => {
     if (err) return res.status(500).send("Database error");
-    res.json({ message: "Post saved" });
+
+    // Return the newly created post
+    const newPost = {
+      id: result.insertId,
+      username,
+      content,
+      replies: [],
+    };
+    res.json(newPost);
   });
 });
 
-app.get("/forum", (req, res) => {
-  db.query(
-    "SELECT * FROM forum_posts ORDER BY created_at DESC",
-    (err, results) => {
-      if (err) return res.status(500).send("Database error");
-      res.json(results);
-    }
-  );
-});
-
-// Forum posts with replies
 app.get("/forum/posts", (req, res) => {
   const sql = `
-    SELECT p.*, JSON_ARRAYAGG(r.message) AS replies
+    SELECT p.id, p.username, p.message AS content,
+           IFNULL(JSON_ARRAYAGG(JSON_OBJECT('username', r.username, 'content', r.message)), '[]') AS replies
     FROM forum_posts p
     LEFT JOIN forum_replies r ON p.id = r.post_id
     GROUP BY p.id
@@ -111,34 +140,32 @@ app.get("/forum/posts", (req, res) => {
   `;
   db.query(sql, (err, results) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    // Parse replies from JSON string to array
+    const posts = results.map(r => ({
+      id: r.id,
+      username: r.username,
+      content: r.content,
+      replies: JSON.parse(r.replies)
+    }));
+    res.json(posts);
   });
 });
 
-app.post("/forum/posts", (req, res) => {
-  const { id, content } = req.body;
-  const sql =
-    "INSERT INTO forum_posts (id, content, created_by_user) VALUES (?, ?, true)";
-  db.query(sql, [id, content], (err) => {
-    if (err) return res.status(500).send(err);
-    res.json({ message: "Post created" });
+app.post("/forum/posts/:id/reply", (req, res) => {
+  const { username, content } = req.body;
+  const postId = req.params.id;
+  if (!username || !content) return res.status(400).send("Missing fields");
+
+  const sql = "INSERT INTO forum_replies (post_id, username, message) VALUES (?, ?, ?)";
+  db.query(sql, [postId, username, content], (err, result) => {
+    if (err) return res.status(500).send("Database error");
+    res.json({ username, content }); // send back the reply object
   });
 });
 
-// Forum replies
-app.post("/forum/replies", (req, res) => {
-  const { postId, message } = req.body;
-  const sql = "INSERT INTO forum_replies (post_id, message) VALUES (?, ?)";
-  db.query(sql, [postId, message], (err) => {
-    if (err) return res.status(500).send(err);
-    res.json({ message: "Reply added" });
-  });
-});
-
-// Delete forum post
 app.delete("/forum/posts/:id", (req, res) => {
   db.query("DELETE FROM forum_posts WHERE id = ?", [req.params.id], (err) => {
-    if (err) return res.status(500).send(err);
+    if (err) return res.status(500).send("Database error");
     res.json({ message: "Post deleted" });
   });
 });
@@ -146,7 +173,6 @@ app.delete("/forum/posts/:id", (req, res) => {
 // ---------- REACT STATIC FILES ----------
 app.use(express.static(path.join(__dirname, "../build")));
 
-// Catch-all to serve React for client-side routing
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "../build/index.html"));
 });
