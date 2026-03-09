@@ -17,6 +17,8 @@ app.use(
   })
 );
 
+
+
 // ---------- DATABASE CONNECTION ----------
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -34,6 +36,69 @@ db.getConnection((err, connection) => {
   console.log("Connected to MySQL database");
   connection.release();
 });
+
+// ---------- AUTH ROUTES ----------
+const bcrypt = require("bcrypt");
+
+app.post("/register", async (req, res) => {
+
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  db.query(
+    "INSERT INTO users (username, password) VALUES (?, ?)",
+    [username, hashedPassword],
+    (err, result) => {
+
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error registering user");
+      }
+
+      res.json({ message: "User registered successfully" });
+    }
+  );
+});
+
+// ---------- Login ROUTES ----------
+
+app.post("/login", (req, res) => {
+
+  const { username, password } = req.body;
+
+  db.query(
+    "SELECT * FROM users WHERE username = ?",
+    [username],
+    async (err, results) => {
+
+      if (err) return res.status(500).json({ error: "Database error" });
+
+      if (results.length === 0) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      const user = results[0];
+
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
+
+      res.json({
+        message: "Login successful",
+        username: user.username,
+        id: user.id
+      });
+    }
+  );
+});
+
 
 // ---------- API ROUTES ----------
 

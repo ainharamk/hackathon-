@@ -14,36 +14,44 @@ function App() {
   const [sleep, setSleep] = useState(null);
   const [lastLog, setLastLog] = useState(null);
 
-  const handleLogin = () => {
-    const name = inputName.trim();
-    const pass = inputPassword.trim();
-    if (!name || !pass) {
-      setLoginError("Please enter both a username and password.");
+  const handleLogin = async () => {
+  const name = inputName.trim();
+  const pass = inputPassword.trim();
+
+  if (!name || !pass) {
+    setLoginError("Please enter both a username and password.");
+    return;
+  }
+
+  try {
+    const endpoint = authMode === "register" ? "/register" : "/login";
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: name,
+        password: pass
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setLoginError(data.error || "Something went wrong");
       return;
     }
-    const storedPassword = localStorage.getItem(`${name}_password`);
 
-    if (authMode === "register") {
-      if (storedPassword) {
-        setLoginError("That username is already taken. Please log in.");
-        return;
-      }
-      localStorage.setItem(`${name}_password`, pass);
-      localStorage.setItem("currentUser", name);
-      setUser(name);
-    } else {
-      if (!storedPassword) {
-        setLoginError("No account found. Please register first.");
-        return;
-      }
-      if (storedPassword !== pass) {
-        setLoginError("Incorrect password.");
-        return;
-      }
-      localStorage.setItem("currentUser", name);
-      setUser(name);
-    }
-  };
+    localStorage.setItem("currentUser", name);
+    setUser(name);
+
+  } catch (error) {
+    console.error(error);
+    setLoginError("Server error");
+  }
+};
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -703,35 +711,33 @@ function App() {
     };
   
   // ---------- SUPPORT GROUP ----------
-const SupportGroup = () => {
+  const SupportGroup = () => {
 
-  const [view, setView] = useState("menu");
+    const [view, setView] = useState("menu");
 
-  const [posts, setPosts] = useState([]);
-  const [showReplies, setShowReplies] = useState({});
+    const [posts, setPosts] = useState([]);
+    const [showReplies, setShowReplies] = useState({});
 
-  const [newPost, setNewPost] = useState("");
-
-
-  useEffect(() => {
-    fetch("/forum")
-      .then(res => res.json())
-      .then(data => setPosts(data));
-  }, []);
+    const [newPost, setNewPost] = useState("");
 
 
-  const handlePostSubmit = async () => {
+    useEffect(() => {
+      fetch("/forum")
+        .then(res => res.json())
+        .then(data => setPosts(data));
+    }, []);
+
+
+    const handlePostSubmit = async () => {
 
     if (!newPost.trim()) return;
 
     const post = {
-      id: Date.now(),
-      content: newPost,
-      createdByUser: true
-
+      username: user,
+      message: newPost
     };
 
-    await fetch("/forum/posts", {
+    await fetch("/forum", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -739,9 +745,11 @@ const SupportGroup = () => {
       body: JSON.stringify(post)
     });
 
-    setPosts([ { ...post, replies: [] }, ...posts ]);
-    setNewPost("");
+    const updated = await fetch("/forum");
+    const data = await updated.json();
+    setPosts(data);
 
+    setNewPost("");
   };
 
 
@@ -820,7 +828,7 @@ const SupportGroup = () => {
   {posts.map(post => (
     <div key={post.id} className="post-box">
 
-      <p><strong>Anonymous:</strong> {post.content}</p>
+      <strong>{post.username}:</strong>
 
       <button
         onClick={() =>
