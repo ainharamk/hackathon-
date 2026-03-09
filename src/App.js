@@ -13,143 +13,7 @@ function App() {
   const [sleep, setSleep] = useState(null);
   const [lastLog, setLastLog] = useState(null);
 
-  // ---------------- LOGIN / REGISTER ----------------
-  const handleLogin = async () => {
-    const name = inputName.trim();
-    const pass = inputPassword.trim();
-    if (!name || !pass) {
-      setLoginError("Please enter both a username and password.");
-      return;
-    }
-
-    try {
-      const response = await fetch("/users");
-      const users = await response.json();
-      const existingUser = users.find(u => u.username === name);
-
-      if (authMode === "register") {
-        if (existingUser) {
-          setLoginError("That username is already taken. Please log in.");
-          return;
-        }
-        await fetch("/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: name, password: pass }),
-        });
-        localStorage.setItem("currentUser", name);
-        setUser(name);
-      } else {
-        if (!existingUser) {
-          setLoginError("No account found. Please register first.");
-          return;
-        }
-        if (existingUser.password !== pass) {
-          setLoginError("Incorrect password.");
-          return;
-        }
-        localStorage.setItem("currentUser", name);
-        setUser(name);
-      }
-    } catch (err) {
-      console.error(err);
-      setLoginError("Error connecting to server.");
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setMood(null);
-    setSleep(null);
-    setLastLog(null);
-    setPage("home");
-    setUser(null);
-  };
-
-  // ---------------- LOAD LAST LOG ----------------
-  useEffect(() => {
-    if (!user) return;
-    const loadLastLog = async () => {
-      try {
-        const response = await fetch("/tracker");
-        const logs = await response.json();
-        const userLogs = logs.filter(log => log.username === user);
-        if (userLogs.length > 0) setLastLog(userLogs[0]);
-        else setLastLog(null);
-      } catch (err) {
-        console.error(err);
-        setLastLog(null);
-      }
-    };
-    loadLastLog();
-  }, [user]);
-
-  // ---------------- LOGIN SCREEN ----------------
-  if (!user) {
-    return (
-      <div className="container">
-        <h1 className="app-title">AFTER 9</h1>
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
-          <button
-            className="main-btn"
-            style={{ opacity: authMode === "login" ? 1 : 0.4 }}
-            onClick={() => { setAuthMode("login"); setLoginError(""); }}
-          >
-            Login
-          </button>
-          <button
-            className="main-btn"
-            style={{ opacity: authMode === "register" ? 1 : 0.4 }}
-            onClick={() => { setAuthMode("register"); setLoginError(""); }}
-          >
-            Register
-          </button>
-        </div>
-        <p>Username</p>
-        <input
-          placeholder="Username..."
-          value={inputName}
-          onChange={(e) => { setInputName(e.target.value); setLoginError(""); }}
-        />
-        <p>Password</p>
-        <input
-          type="password"
-          placeholder="Password..."
-          value={inputPassword}
-          onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }}
-        />
-        {loginError && <p style={{ color: "red" }}>{loginError}</p>}
-        <button className="main-btn" onClick={handleLogin}>
-          {authMode === "login" ? "Login" : "Create Account"}
-        </button>
-      </div>
-    );
-  }
-  if (page === "daily") return <DailyTracker />;
-  if (page === "dailyResult") return <DailyResult />;
-  if (page === "monthly") return <MonthlyCheckin />;
-  if (page === "calendar") return <CalendarPage />;
-  if (page === "support") return <SupportGroup />;
-  if (page === "emergency") return <EmergencyContacts />;
-  if (page === "info") return <Information />;
-  if (page === "home") {
-  return (
-    <div className="container">
-      <h1>Welcome, {user}!</h1>
-      <div className="vertical-options">
-        <button className="main-btn" onClick={() => setPage("daily")}>Daily Tracker</button>
-        <button className="main-btn" onClick={() => setPage("monthly")}>Monthly Check-In</button>
-        <button className="main-btn" onClick={() => setPage("calendar")}>Calendar</button>
-        <button className="main-btn" onClick={() => setPage("support")}>Support Group</button>
-        <button className="main-btn" onClick={() => setPage("emergency")}>Emergency Contacts</button>
-        <button className="main-btn" onClick={() => setPage("info")}>Information</button>
-        <button className="main-btn" onClick={handleLogout}>Logout</button>
-      </div>
-    </div>
-  );
-}
-
-  // ================== CHILD COMPONENTS ==================
+    // ================== CHILD COMPONENTS ==================
 
   const DailyTracker = () => {
     const [localMood, setLocalMood] = useState(null);
@@ -1167,10 +1031,143 @@ const Information = () => {
     );
   }
 
+  // ---------------- LOGIN / REGISTER ----------------
+  const handleLogin = async () => {
+    const name = inputName.trim();
+    const pass = inputPassword.trim();
+    if (!name || !pass) {
+      setLoginError("Please enter both a username and password.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/users");
+      const users = await response.json();
+      const existingUser = users.find(u => u.username === name);
+
+      if (authMode === "register") {
+        if (existingUser) {
+          setLoginError("That username is already taken. Please log in.");
+          return;
+        }
+        await fetch("/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: name, password: pass }),
+        });
+        localStorage.setItem("currentUser", name);
+        setUser(name);
+      } else {
+        if (!existingUser) {
+          setLoginError("No account found. Please register first.");
+          return;
+        }
+        if (existingUser.password !== pass) {
+          setLoginError("Incorrect password.");
+          return;
+        }
+        localStorage.setItem("currentUser", name);
+        setUser(name);
+      }
+    } catch (err) {
+      console.error(err);
+      setLoginError("Error connecting to server.");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setMood(null);
+    setSleep(null);
+    setLastLog(null);
+    setPage("home");
+    setUser(null);
+  };
+
+  // ---------------- LOAD LAST LOG ----------------
+  useEffect(() => {
+    if (!user) return;
+    const loadLastLog = async () => {
+      try {
+        const response = await fetch("/tracker");
+        const logs = await response.json();
+        const userLogs = logs.filter(log => log.username === user);
+        if (userLogs.length > 0) setLastLog(userLogs[0]);
+        else setLastLog(null);
+      } catch (err) {
+        console.error(err);
+        setLastLog(null);
+      }
+    };
+    loadLastLog();
+  }, [user]);
+
+  // ---------------- LOGIN SCREEN ----------------
+  if (!user) {
+    return (
+      <div className="container">
+        <h1 className="app-title">AFTER 9</h1>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
+          <button
+            className="main-btn"
+            style={{ opacity: authMode === "login" ? 1 : 0.4 }}
+            onClick={() => { setAuthMode("login"); setLoginError(""); }}
+          >
+            Login
+          </button>
+          <button
+            className="main-btn"
+            style={{ opacity: authMode === "register" ? 1 : 0.4 }}
+            onClick={() => { setAuthMode("register"); setLoginError(""); }}
+          >
+            Register
+          </button>
+        </div>
+        <p>Username</p>
+        <input
+          placeholder="Username..."
+          value={inputName}
+          onChange={(e) => { setInputName(e.target.value); setLoginError(""); }}
+        />
+        <p>Password</p>
+        <input
+          type="password"
+          placeholder="Password..."
+          value={inputPassword}
+          onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }}
+        />
+        {loginError && <p style={{ color: "red" }}>{loginError}</p>}
+        <button className="main-btn" onClick={handleLogin}>
+          {authMode === "login" ? "Login" : "Create Account"}
+        </button>
+      </div>
+    );
+  }
+  if (page === "daily") return <DailyTracker />;
+  if (page === "dailyResult") return <DailyResult />;
+  if (page === "monthly") return <MonthlyCheckin />;
+  if (page === "calendar") return <CalendarPage />;
+  if (page === "support") return <SupportGroup />;
+  if (page === "emergency") return <EmergencyContacts />;
+  if (page === "info") return <Information />;
+  if (page === "home") {
+  return (
+    <div className="container">
+      <h1>Welcome, {user}!</h1>
+      <div className="vertical-options">
+        <button className="main-btn" onClick={() => setPage("daily")}>Daily Tracker</button>
+        <button className="main-btn" onClick={() => setPage("monthly")}>Monthly Check-In</button>
+        <button className="main-btn" onClick={() => setPage("calendar")}>Calendar</button>
+        <button className="main-btn" onClick={() => setPage("support")}>Support Group</button>
+        <button className="main-btn" onClick={() => setPage("emergency")}>Emergency Contacts</button>
+        <button className="main-btn" onClick={() => setPage("info")}>Information</button>
+        <button className="main-btn" onClick={handleLogout}>Logout</button>
+      </div>
+    </div>
+  );
+}
 
 
-
-};
 
   // ---------------- PAGE ROUTING ----------------
   if (page === "daily") return <DailyTracker />;
@@ -1194,6 +1191,8 @@ const Information = () => {
       </div>
     </div>
   );
+}
+
 
 
 export default App;
