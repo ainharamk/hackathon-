@@ -818,86 +818,320 @@ function App() {
   const Information = () => {
     const [view, setView] = useState("menu");
 
+    const ExternalLink = ({ href, children }) => (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="article-link">
+        {children} ↗
+      </a>
+    );
+
+    const Helpline = ({ name, number, hours, href }) => (
+      <div className="helpline-card">
+        <div className="helpline-name">{name}</div>
+        {number && <div className="helpline-number">{number}</div>}
+        {hours && <div className="helpline-hours">{hours}</div>}
+        {href && <ExternalLink href={href}>Visit website</ExternalLink>}
+      </div>
+    );
+
     if (view === "menu") {
+      const articles = [
+        { key: "article1", icon: "🧠", title: "What is Postnatal Depression?", desc: "Symptoms & how it differs from baby blues" },
+        { key: "article2", icon: "⚠️", title: "Risk Factors", desc: "Who is more likely to be affected and why" },
+        { key: "article3", icon: "💊", title: "Treatment & Recovery", desc: "Therapy, medication & self-help" },
+        { key: "article4", icon: "🌟", title: "You're Not Alone", desc: "Public figures who have spoken out" },
+        { key: "article5", icon: "💬", title: "Reducing Stigma", desc: "Breaking barriers to seeking help" },
+        { key: "article6", icon: "🚨", title: "When to Seek Help", desc: "Warning signs & what to do" },
+      ];
       return (
         <div className="container">
           <h2>Information & Awareness</h2>
-          <p>Explore educational articles about postpartum mental health, symptoms, recovery, and real experiences.</p>
+          <p style={{ fontSize: "13px", color: "#6d28d9", marginBottom: "16px" }}>
+            Trusted resources from the NHS, WHO, and leading health organisations.
+          </p>
           <div className="article-grid">
-            <div className="article-card" onClick={() => setView("article1")}>Article 1</div>
-            <div className="article-card" onClick={() => setView("article2")}>Article 2</div>
-            <div className="article-card" onClick={() => setView("article3")}>Article 3</div>
-            <div className="article-card" onClick={() => setView("article4")}>Article 4</div>
-            <div className="article-card" onClick={() => setView("article5")}>Article 5</div>
-            <div className="article-card" onClick={() => setView("article6")}>Article 6</div>
+            {articles.map(a => (
+              <div key={a.key} className="article-card" onClick={() => setView(a.key)}>
+                <div className="article-card-icon">{a.icon}</div>
+                <div className="article-card-title">{a.title}</div>
+                <div className="article-card-desc">{a.desc}</div>
+              </div>
+            ))}
           </div>
           <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
+
     if (view === "article1") {
       return (
         <div className="container">
-          <h2>About Postpartum Depression</h2>
-          <p>Postpartum depression is a mood disorder that can occur after childbirth. If untreated, it may progress into chronic major depressive disorder.</p>
-          <h3>Common Symptoms</h3>
-          <ul>
-            <li>Persistent sadness</li>
-            <li>Loss of interest in activities</li>
-            <li>Sleep disturbance</li>
-            <li>Feelings of guilt or worthlessness</li>
-            <li>Difficulty bonding with baby</li>
-          </ul>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="back-link" onClick={() => setView("menu")}>← Back to Articles</button>
+          <div className="article">
+            <div className="article-badge">🧠 Understanding PND</div>
+            <h2>What is Postnatal Depression?</h2>
+            <p>
+              Postnatal depression (PND) is a type of depression that can affect parents after having a baby.
+              It's more common than many people realise — <strong>affecting more than 1 in every 10 women
+              within a year of giving birth</strong>, and it can also affect fathers and partners.
+            </p>
+            <div className="article-callout">
+              💡 PND is different from the "baby blues" — a normal period of tearfulness and low mood in the
+              first week after birth that usually passes within 2 weeks. PND lasts longer and requires support.
+            </div>
+            <h3>Common Symptoms</h3>
+            <ul>
+              <li>Persistent low mood or sadness</li>
+              <li>Feeling unable to enjoy things you used to love</li>
+              <li>Withdrawing from family and friends</li>
+              <li>Feeling exhausted but unable to sleep</li>
+              <li>Difficulty bonding with your baby</li>
+              <li>Frightening thoughts about harming yourself or your baby</li>
+              <li>Feelings of guilt, worthlessness, or being a bad mother</li>
+            </ul>
+            <p>
+              PND can develop gradually and is often hard to recognise. Many mothers don't seek help
+              because they worry they'll be judged — but it is a medical condition, not a personal failing.
+            </p>
+            <div className="article-video">
+              <p className="video-label">📺 Watch: NHS — Understanding Postnatal Depression</p>
+              <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/overview/">
+                NHS Postnatal Depression Guide
+              </ExternalLink>
+            </div>
+            <h3>Trusted Sources</h3>
+            <div className="link-list">
+              <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/overview/">NHS — Postnatal Depression Overview</ExternalLink>
+              <ExternalLink href="https://www.who.int/teams/mental-health-and-substance-use/promotion-prevention/maternal-mental-health">WHO — Maternal Mental Health</ExternalLink>
+              <ExternalLink href="https://www.unicef.org/parenting/mental-health/what-postpartum-depression">UNICEF — What is Postpartum Depression?</ExternalLink>
+              <ExternalLink href="https://www.rcpsych.ac.uk/mental-health/problems-disorders/post-natal-depression">Royal College of Psychiatrists — PND</ExternalLink>
+            </div>
+            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+          </div>
         </div>
       );
     }
+
     if (view === "article2") {
       return (
         <div className="container">
-          <h2>Risk Factors</h2>
-          <p>Factors such as lack of support, previous depression, traumatic birth experience, or hormonal changes can increase risk.</p>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="back-link" onClick={() => setView("menu")}>← Back to Articles</button>
+          <div className="article">
+            <div className="article-badge">⚠️ Risk Factors</div>
+            <h2>Who is at Risk?</h2>
+            <p>
+              Postnatal depression can affect <em>anyone</em> — even those with no previous mental health history.
+              However, certain factors can increase the likelihood of developing it.
+            </p>
+            <div className="article-callout">
+              ⚠️ Having risk factors doesn't mean you will develop PND, and having none of them doesn't mean
+              you won't. The important thing is knowing what to watch for.
+            </div>
+            <h3>Known Risk Factors</h3>
+            <ul>
+              <li>A personal or family history of depression or mental illness</li>
+              <li>Mental health problems during pregnancy (antenatal depression or anxiety)</li>
+              <li>A difficult or traumatic birth experience</li>
+              <li>Lack of support from a partner, family or friends</li>
+              <li>Relationship difficulties or domestic stress</li>
+              <li>Financial worries or housing insecurity</li>
+              <li>A premature baby or baby with health complications</li>
+              <li>Significant hormonal changes after birth</li>
+              <li>Previous miscarriage or pregnancy loss</li>
+              <li>Having an unplanned pregnancy</li>
+            </ul>
+            <h3>Why Hormones Matter</h3>
+            <p>
+              After birth, levels of oestrogen and progesterone drop sharply. This sudden hormonal shift
+              can affect brain chemistry in ways that trigger depression — similar to how smaller hormonal
+              changes can cause premenstrual mood changes, but more intense.
+            </p>
+            <h3>Trusted Sources</h3>
+            <div className="link-list">
+              <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/causes/">NHS — Causes of Postnatal Depression</ExternalLink>
+              <ExternalLink href="https://www.acog.org/womens-health/faqs/postpartum-depression">American College of Obstetricians &amp; Gynecologists</ExternalLink>
+              <ExternalLink href="https://www.psychiatry.org/patients-families/peripartum-depression/what-is-peripartum-depression">American Psychiatric Association — Perinatal Depression</ExternalLink>
+            </div>
+            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+          </div>
         </div>
       );
     }
+
     if (view === "article3") {
       return (
         <div className="container">
-          <h2>Treatment & Recovery</h2>
-          <p>Treatment may include therapy, medication, lifestyle adjustments, and increased social support.</p>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="back-link" onClick={() => setView("menu")}>← Back to Articles</button>
+          <div className="article">
+            <div className="article-badge">💊 Treatment & Recovery</div>
+            <h2>Treatment & Recovery</h2>
+            <p>
+              With the right treatment and support, <strong>most people make a full recovery from postnatal
+              depression</strong> — although it can take time. The sooner you seek help, the sooner you can
+              start feeling better.
+            </p>
+            <h3>Talking Therapies</h3>
+            <ul>
+              <li><strong>Cognitive Behavioural Therapy (CBT)</strong> — helps you identify and change negative thought patterns</li>
+              <li><strong>Interpersonal Therapy (IPT)</strong> — focuses on relationships and communication</li>
+              <li><strong>Guided self-help</strong> — working through a programme, sometimes with therapist support</li>
+            </ul>
+            <h3>Medication</h3>
+            <p>
+              Antidepressants may be recommended for moderate to severe PND, or if therapy alone isn't helping.
+              Your GP can prescribe options that are safe to take while breastfeeding. They usually take
+              1–2 weeks to start working and are typically taken for at least 6 months.
+            </p>
+            <h3>Self-Help Strategies</h3>
+            <ul>
+              <li>Talk openly with your partner, family, or friends</li>
+              <li>Accept help when it's offered — you don't need to do it all alone</li>
+              <li>Rest when your baby rests</li>
+              <li>Eat regular nutritious meals</li>
+              <li>Gentle exercise such as walking can significantly improve mood</li>
+              <li>Join a local or online mothers' support group</li>
+            </ul>
+            <div className="article-callout">
+              🩺 You can self-refer to NHS talking therapies in England — you don't need a GP referral.{" "}
+              <ExternalLink href="https://www.nhs.uk/service-search/mental-health/find-an-nhs-talking-therapies-service/">Find a service near you</ExternalLink>
+            </div>
+            <h3>Trusted Sources</h3>
+            <div className="link-list">
+              <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/treatment/">NHS — Treatment for Postnatal Depression</ExternalLink>
+              <ExternalLink href="https://www.mind.org.uk/information-support/types-of-mental-health-problems/postnatal-depression-and-perinatal-mental-health/">Mind — Postnatal Depression Support</ExternalLink>
+            </div>
+            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+          </div>
         </div>
       );
     }
+
     if (view === "article4") {
       return (
         <div className="container">
-          <h2>Public Figures Who Spoke Out</h2>
-          <ul>
-            <li>Adele – shared her experience with postpartum depression</li>
-            <li>Chrissy Teigen – discussed her postpartum mental health journey</li>
-            <li>Serena Williams – spoke about emotional challenges after childbirth</li>
-          </ul>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="back-link" onClick={() => setView("menu")}>← Back to Articles</button>
+          <div className="article">
+            <div className="article-badge">🌟 Real Stories</div>
+            <h2>You're Not Alone</h2>
+            <p>
+              Postnatal depression affects women across all walks of life. When public figures speak openly
+              about their experiences, it helps break the silence and encourages others to seek help.
+            </p>
+            <div className="article-callout">
+              💜 "You are not alone, you are not to blame, and with help, you will get better." — Postpartum Support International
+            </div>
+            <h3>Voices That Helped Break the Stigma</h3>
+            <div className="story-card">
+              <div className="story-name">Adele</div>
+              <p>The singer has spoken about experiencing postnatal depression after the birth of her son,
+              describing feeling like she didn't recognise herself. Talking to other mothers and realising
+              she wasn't alone was what began to help her.</p>
+            </div>
+            <div className="story-card">
+              <div className="story-name">Chrissy Teigen</div>
+              <p>Chrissy Teigen wrote an open essay describing her postpartum depression experience — including
+              not being able to get out of bed and feeling completely detached. Her honesty helped millions
+              of women recognise their own symptoms.</p>
+            </div>
+            <div className="story-card">
+              <div className="story-name">Serena Williams</div>
+              <p>Serena Williams has spoken about the emotional challenges she faced after the birth of her
+              daughter, including feeling overwhelmed and anxious. She has used her platform to encourage
+              mothers to speak up without shame.</p>
+            </div>
+            <div className="story-card">
+              <div className="story-name">Hayden Panettiere</div>
+              <p>The actress sought inpatient treatment for postnatal depression and has spoken publicly about
+              how serious the condition can be, urging other mothers not to wait to get professional help.</p>
+            </div>
+            <h3>More Real Stories</h3>
+            <div className="link-list">
+              <ExternalLink href="https://www.pandasfoundation.org.uk/stories/">PANDAS Foundation — Real Stories</ExternalLink>
+              <ExternalLink href="https://apni.org/">Association for Post Natal Illness — Personal Experiences</ExternalLink>
+            </div>
+            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+          </div>
         </div>
       );
     }
+
     if (view === "article5") {
       return (
         <div className="container">
-          <h2>Reducing Stigma</h2>
-          <p>Increasing awareness reduces stigma and promotes early intervention. Open discussion encourages mothers to seek help sooner.</p>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="back-link" onClick={() => setView("menu")}>← Back to Articles</button>
+          <div className="article">
+            <div className="article-badge">💬 Reducing Stigma</div>
+            <h2>Reducing Stigma</h2>
+            <p>
+              Despite being one of the most common complications of childbirth, postnatal depression remains
+              widely misunderstood. Stigma — both social and self-imposed — is one of the biggest barriers
+              to mothers getting the help they need.
+            </p>
+            <h3>Common Myths — Debunked</h3>
+            <ul>
+              <li><strong>"Good mothers don't get depressed."</strong> — False. PND is a medical condition, not a reflection of your love for your baby or your ability as a mother.</li>
+              <li><strong>"It's just hormones — it will pass."</strong> — PND is caused by many factors and doesn't always resolve on its own. It needs proper support.</li>
+              <li><strong>"If I tell someone, they'll take my baby away."</strong> — False. Seeking help shows you're a caring parent. Babies are very rarely removed due to a parent's mental health.</li>
+              <li><strong>"It only affects certain types of people."</strong> — PND can affect anyone, regardless of background, income, or how much they wanted their baby.</li>
+            </ul>
+            <div className="article-callout">
+              📢 The more openly we talk about postnatal depression, the easier it becomes for mothers to
+              recognise their symptoms and reach out before things get worse.
+            </div>
+            <h3>What You Can Do</h3>
+            <ul>
+              <li>Talk openly with friends and family about how you're feeling</li>
+              <li>Share reliable resources with people you know</li>
+              <li>Challenge misconceptions when you hear them</li>
+              <li>Reach out to a mother you're worried about — a simple check-in makes all the difference</li>
+            </ul>
+            <h3>Trusted Sources</h3>
+            <div className="link-list">
+              <ExternalLink href="https://maternalmentalhealthalliance.org/">Maternal Mental Health Alliance</ExternalLink>
+              <ExternalLink href="https://www.mind.org.uk/information-support/types-of-mental-health-problems/postnatal-depression-and-perinatal-mental-health/">Mind UK — Perinatal Mental Health</ExternalLink>
+              <ExternalLink href="https://www.nhsinform.scot/illnesses-and-conditions/mental-health/postnatal-depression/">NHS Inform — Postnatal Depression</ExternalLink>
+            </div>
+            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+          </div>
         </div>
       );
     }
+
     if (view === "article6") {
       return (
         <div className="container">
-          <h2>When to Seek Help</h2>
-          <p>If symptoms last longer than two weeks, interfere with daily life, or include thoughts of self-harm, professional support is strongly advised.</p>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="back-link" onClick={() => setView("menu")}>← Back to Articles</button>
+          <div className="article">
+            <div className="article-badge">🚨 Getting Help</div>
+            <h2>When to Seek Help</h2>
+            <p>
+              If you or someone you know is experiencing symptoms of postnatal depression,
+              <strong> please don't wait</strong>. Early support leads to faster recovery.
+            </p>
+            <h3>Seek Help If You Experience:</h3>
+            <ul>
+              <li>Low mood or sadness lasting more than 2 weeks</li>
+              <li>Feeling unable to cope with day-to-day life</li>
+              <li>Difficulty caring for yourself or your baby</li>
+              <li>Thoughts of harming yourself or your baby</li>
+              <li>Feeling detached from reality or experiencing confusion</li>
+            </ul>
+            <div className="article-callout alert-red">
+              🚨 If you are having thoughts of harming yourself or your baby <strong>right now</strong>, call <strong>999</strong> or go to your nearest A&amp;E immediately.
+            </div>
+            <h3>UK Helplines &amp; Support</h3>
+            <Helpline name="PANDAS Foundation" number="0808 196 1776" hours="11am–10pm, every day" href="https://www.pandasfoundation.org.uk/" />
+            <Helpline name="Association for Post Natal Illness (APNI)" number="020 7386 0868" hours="Mon–Fri, 10am–2pm" href="https://apni.org/" />
+            <Helpline name="Mind Infoline" number="0300 123 3393" hours="Mon–Fri, 9am–6pm" href="https://www.mind.org.uk/" />
+            <Helpline name="Samaritans (24/7)" number="116 123" hours="Available 24 hours a day, 7 days a week" href="https://www.samaritans.org/" />
+            <Helpline name="NCT Helpline" number="0300 330 0700" hours="Mon–Fri, 9am–5pm" href="https://www.nct.org.uk/" />
+            <h3>NHS Resources</h3>
+            <div className="link-list">
+              <ExternalLink href="https://www.nhs.uk/service-search/mental-health/find-an-nhs-talking-therapies-service/">Find NHS Talking Therapies near you</ExternalLink>
+              <ExternalLink href="https://www.nhs.uk/mental-health/conditions/post-natal-depression/overview/">NHS — Postnatal Depression</ExternalLink>
+              <ExternalLink href="https://maternalmentalhealthalliance.org/campaign/help/">Maternal Mental Health Alliance — Get Help</ExternalLink>
+            </div>
+            <button className="main-btn" onClick={() => setView("menu")}>← Back to Articles</button>
+          </div>
         </div>
       );
     }
