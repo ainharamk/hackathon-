@@ -70,10 +70,10 @@ function App() {
     if (!user) return;
     const loadLastLog = async () => {
       try {
-        const response = await fetch("/tracker");
+        const response = await fetch(`/tracker?username=${encodeURIComponent(user)}`);
         const logs = await response.json();
-        const userLogs = logs.filter(log => log.username === user);
-        if (userLogs.length > 0) setLastLog(userLogs[0]);
+        // Server returns mood as Number and filters by user already
+        if (logs.length > 0) setLastLog(logs[0]);
         else setLastLog(null);
       } catch (err) {
         console.error(err);
@@ -130,8 +130,8 @@ function App() {
           <h3>YESTERDAY</h3>
           {displayLog ? (
             <>
-              <p><strong>Mood:</strong> {displayLog.mood ?? displayLog.mood}</p>
-              <p><strong>Sleep:</strong> {displayLog.hours_slept ?? displayLog.sleep} hrs</p>
+              <p><strong>Mood:</strong> {displayLog.mood}</p>
+              <p><strong>Sleep:</strong> {displayLog.hours_slept != null ? displayLog.hours_slept : displayLog.sleep} hrs</p>
             </>
           ) : (
             <p>No previous log.</p>

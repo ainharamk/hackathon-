@@ -47,7 +47,7 @@ app.post("/users/register", (req, res) => {
     return res.status(400).send("Username and password required");
 
   db.query(
-    "SELECT * FROM users WHERE username = ?",
+    "SELECT id FROM users WHERE username = ?",
     [username],
     (err, results) => {
       if (err) return res.status(500).send("Database error");
@@ -98,9 +98,46 @@ app.post("/tracker", (req, res) => {
   });
 });
 
+// Returns the most recent log for the given user (?username=xxx)
 app.get("/tracker", (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).send("username query param required");
+  }
+
   db.query(
-    "SELECT * FROM daily_tracker ORDER BY created_at DESC",
+    "SELECT * FROM daily_tracker WHERE username = ? ORDER BY created_at DESC, id DESC LIMIT 1",
+    [username],
+    (err, results) => {
+      if (err) return res.status(500).send("Database error");
+      // mood is stored as varchar in the DB schema — parse back to number
+      // so frontend colour-coding comparisons (mood <= 2 etc.) work correctly
+      const parsed = results.map(r => ({ ...r, mood: Number(r.mood) }));
+      res.json(parsed);
+    }
+  );
+});
+
+// ---------- MONTHLY CHECK-IN ----------
+app.post("/checkin", (req, res) => {
+  const { username, answers } = req.body;
+  if (!username || !answers) return res.status(400).send("Missing fields");
+
+  const sql = "INSERT INTO monthly_checkin (username, answers) VALUES (?, ?)";
+  db.query(sql, [username, JSON.stringify(answers)], (err) => {
+    if (err) return res.status(500).send("Database error");
+    res.json({ message: "Check-in saved" });
+  });
+});
+
+app.get("/checkin", (req, res) => {
+  const { username } = req.query;
+  if (!username) return res.status(400).send("Username required");
+
+  db.query(
+    "SELECT * FROM monthly_checkin WHERE username = ? ORDER BY created_at DESC LIMIT 1",
+    [username],
     (err, results) => {
       if (err) return res.status(500).send("Database error");
       res.json(results);
@@ -118,7 +155,6 @@ app.post("/forum/posts", (req, res) => {
   db.query(sql, [username, content], (err, result) => {
     if (err) return res.status(500).send("Database error");
 
-    // Return the newly created post
     const newPost = {
       id: result.insertId,
       username,
@@ -132,20 +168,26 @@ app.post("/forum/posts", (req, res) => {
 app.get("/forum/posts", (req, res) => {
   const sql = `
     SELECT p.id, p.username, p.message AS content,
-           IFNULL(JSON_ARRAYAGG(JSON_OBJECT('username', r.username, 'content', r.message)), '[]') AS replies
+           IFNULL(
+             JSON_ARRAYAGG(
+               CASE WHEN r.id IS NOT NULL
+               THEN JSON_OBJECT('username', r.username, 'content', r.message)
+               ELSE NULL END
+             ),
+             JSON_ARRAY()
+           ) AS replies
     FROM forum_posts p
     LEFT JOIN forum_replies r ON p.id = r.post_id
-    GROUP BY p.id
+    GROUP BY p.id, p.username, p.message
     ORDER BY p.created_at DESC
   `;
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).send(err);
-    // Parse replies from JSON string to array
+    if (err) return res.status(500).send("Database error");
     const posts = results.map(r => ({
       id: r.id,
       username: r.username,
       content: r.content,
-      replies: JSON.parse(r.replies)
+      replies: JSON.parse(r.replies).filter(Boolean),
     }));
     res.json(posts);
   });
@@ -157,16 +199,30 @@ app.post("/forum/posts/:id/reply", (req, res) => {
   if (!username || !content) return res.status(400).send("Missing fields");
 
   const sql = "INSERT INTO forum_replies (post_id, username, message) VALUES (?, ?, ?)";
-  db.query(sql, [postId, username, content], (err, result) => {
+  db.query(sql, [postId, username, content], (err) => {
     if (err) return res.status(500).send("Database error");
-    res.json({ username, content }); // send back the reply object
+    res.json({ username, content });
   });
 });
 
 app.delete("/forum/posts/:id", (req, res) => {
+  // Replies deleted automatically via ON DELETE CASCADE
   db.query("DELETE FROM forum_posts WHERE id = ?", [req.params.id], (err) => {
     if (err) return res.status(500).send("Database error");
     res.json({ message: "Post deleted" });
+  });
+});
+
+// ---------- EXPERT QUESTIONS ----------
+app.post("/forum/experts", (req, res) => {
+  const { username, content } = req.body;
+  if (!username || !content) return res.status(400).send("Missing fields");
+
+  const sql =
+    "INSERT INTO forum_posts (username, message, created_by_user) VALUES (?, ?, false)";
+  db.query(sql, [username, `[EXPERT QUESTION] ${content}`], (err) => {
+    if (err) return res.status(500).send("Database error");
+    res.json({ message: "Expert question submitted" });
   });
 });
 
