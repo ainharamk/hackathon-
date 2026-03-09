@@ -619,6 +619,7 @@ function App() {
     const [showReplies, setShowReplies] = useState({});
     const [expertMsg, setExpertMsg] = useState("");
     const [expertSubmitted, setExpertSubmitted] = useState(false);
+    const [anonymous, setAnonymous] = useState(false);
 
     useEffect(() => {
       loadPosts();
@@ -640,7 +641,7 @@ function App() {
         const res = await fetch("/forum/posts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: newPost, username: user })
+          body: JSON.stringify({ content: newPost, username: user, anonymous })
         });
         const createdPost = await res.json();
         setPosts([createdPost, ...posts]);
@@ -671,7 +672,11 @@ function App() {
 
     const handleDeletePost = async (postId) => {
       try {
-        await fetch(`/forum/posts/${postId}`, { method: "DELETE" });
+        await fetch(`/forum/posts/${postId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user })
+        });
         setPosts(posts.filter(p => p.id !== postId));
       } catch (err) {
         console.error("Error deleting post:", err);
@@ -741,6 +746,18 @@ function App() {
             value={newPost}
             onChange={(e) => setNewPost(e.target.value)}
           />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "0 0 14px 0" }}>
+            <input
+              type="checkbox"
+              id="anon-check"
+              checked={anonymous}
+              onChange={(e) => setAnonymous(e.target.checked)}
+              style={{ width: "18px", height: "18px", cursor: "pointer", accentColor: "#b88f6e" }}
+            />
+            <label htmlFor="anon-check" style={{ fontSize: "13px", color: "#4b4038", cursor: "pointer", userSelect: "none" }}>
+              Post anonymously
+            </label>
+          </div>
           <button className="main-btn" style={{ width: "100%" }} onClick={handlePostSubmit}>
             Post 💜
           </button>
@@ -764,7 +781,7 @@ function App() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
               {posts.map(post => {
-                const isOwn = post.username === user;
+                const isOwn = (post.real_username || post.username) === user;
                 const replyCount = post.replies?.length || 0;
                 return (
                   <div key={post.id} style={{

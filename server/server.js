@@ -3,6 +3,8 @@ const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
 const path = require("path");
+const bcrypt = require("bcrypt");
+const SALT_ROUNDS = 10;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -56,14 +58,17 @@ app.post("/users/register", (req, res) => {
       if (err) return res.status(500).send("Database error");
       if (results.length > 0) return res.status(400).send("Username taken");
 
-      db.query(
-        "INSERT INTO users (username, password) VALUES (?, ?)",
-        [username, password],
-        (err) => {
-          if (err) return res.status(500).send("Database error");
-          res.json({ message: "User registered", username });
-        }
-      );
+      bcrypt.hash(password, SALT_ROUNDS, (err, hash) => {
+        if (err) return res.status(500).send("Error hashing password");
+        db.query(
+          "INSERT INTO users (username, password) VALUES (?, ?)",
+          [username, hash],
+          (err) => {
+            if (err) return res.status(500).send("Database error");
+            res.json({ message: "User registered", username });
+          }
+        );
+      });
     }
   );
 });
@@ -79,10 +84,12 @@ app.post("/users/login", (req, res) => {
     (err, results) => {
       if (err) return res.status(500).send("Database error");
       if (results.length === 0) return res.status(400).send("User not found");
-      if (results[0].password !== password)
-        return res.status(400).send("Incorrect password");
 
-      res.json({ message: "Login successful", username });
+      bcrypt.compare(password, results[0].password, (err, match) => {
+        if (err) return res.status(500).send("Error checking password");
+        if (!match) return res.status(400).send("Incorrect password");
+        res.json({ message: "Login successful", username });
+      });
     }
   );
 });
@@ -123,28 +130,34 @@ app.get("/tracker", (req, res) => {
 
 // ---------- FORUM POSTS & REPLIES ----------
 app.post("/forum/posts", (req, res) => {
-  const { username, content } = req.body;
+  const { username, content, anonymous } = req.body;
   if (!username || !content) return res.status(400).send("Missing fields");
 
-  const sql =
-    "INSERT INTO forum_posts (username, message, created_by_user) VALUES (?, ?, true)";
-  db.query(sql, [username, content], (err, result) => {
-    if (err) return res.status(500).send("Database error");
+  // real_username always stores the actual user so they can delete their own posts
+  // display username is "Anonymous" if the user ticked the box
+  const displayName = anonymous ? "Anonymous" : username;
 
-    const newPost = {
-      id: result.insertId,
-      username,
-      content,
-      replies: [],
-    };
-    res.json(newPost);
+  const sql =
+    "INSERT INTO forum_posts (username, message, created_by_user, real_username) VALUES (?, ?, true, ?)";
+  db.query(sql, [displayName, content, username], (err, result) => {
+    if (err) {
+      // If real_username column doesn't exist yet, fall back gracefully
+      const fallbackSql =
+        "INSERT INTO forum_posts (username, message, created_by_user) VALUES (?, ?, true)";
+      db.query(fallbackSql, [displayName, content], (err2, result2) => {
+        if (err2) return res.status(500).send("Database error");
+        res.json({ id: result2.insertId, username: displayName, real_username: username, content, replies: [] });
+      });
+      return;
+    }
+    res.json({ id: result.insertId, username: displayName, real_username: username, content, replies: [] });
   });
 });
 
 app.get("/forum/posts", (req, res) => {
   // Use a subquery instead of JSON_ARRAYAGG to avoid null/empty JSON parse issues
   const sql = `
-    SELECT p.id, p.username, p.message AS content
+    SELECT p.id, p.username, p.message AS content, COALESCE(p.real_username, p.username) AS real_username
     FROM forum_posts p
     ORDER BY p.created_at DESC
   `;
@@ -174,6 +187,7 @@ app.get("/forum/posts", (req, res) => {
       const result = posts.map(p => ({
         id: p.id,
         username: p.username,
+        real_username: p.real_username,
         content: p.content,
         replies: replyMap[p.id] || [],
       }));
@@ -196,8 +210,10 @@ app.post("/forum/posts/:id/reply", (req, res) => {
 });
 
 app.delete("/forum/posts/:id", (req, res) => {
-  // Replies deleted automatically via ON DELETE CASCADE
-  db.query("DELETE FROM forum_posts WHERE id = ?", [req.params.id], (err) => {
+  const { username } = req.body;
+  // Allow delete if real_username matches or fall back to username match
+  const sql = "DELETE FROM forum_posts WHERE id = ? AND (COALESCE(real_username, username) = ? OR username = ?)";
+  db.query(sql, [req.params.id, username, username], (err) => {
     if (err) return res.status(500).send("Database error");
     res.json({ message: "Post deleted" });
   });
