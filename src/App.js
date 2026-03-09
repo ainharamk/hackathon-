@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import './App.css';
 
 function App() {
   // ---------- GLOBAL STATES ----------
@@ -22,29 +23,28 @@ function App() {
       return;
     }
     try {
-      const response = await fetch("/users");
-      const users = await response.json();
-      const existingUser = users.find(u => u.username === name);
-
       if (authMode === "register") {
-        if (existingUser) {
-          setLoginError("That username is already taken. Please log in.");
-          return;
-        }
-        await fetch("/users", {
+        const res = await fetch("/users/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username: name, password: pass }),
         });
+        if (!res.ok) {
+          const msg = await res.text();
+          setLoginError(msg || "Registration failed.");
+          return;
+        }
         localStorage.setItem("currentUser", name);
         setUser(name);
       } else {
-        if (!existingUser) {
-          setLoginError("No account found. Please register first.");
-          return;
-        }
-        if (existingUser.password !== pass) {
-          setLoginError("Incorrect password.");
+        const res = await fetch("/users/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: name, password: pass }),
+        });
+        if (!res.ok) {
+          const msg = await res.text();
+          setLoginError(msg || "Login failed.");
           return;
         }
         localStorage.setItem("currentUser", name);
@@ -118,17 +118,26 @@ function App() {
       }
     };
 
+    // Use server lastLog if available, otherwise fall back to localStorage
+    const displayLog = lastLog || localLastLog;
+
     return (
       <div className="container">
         <h2>Daily Tracker</h2>
-        {localLastLog ? (
-          <>
-            <p>Yesterday's Mood: {localLastLog.mood}</p>
-            <p>Yesterday's Sleep: {localLastLog.sleep} hrs</p>
-          </>
-        ) : (
-          <p>No previous log.</p>
-        )}
+
+        {/* Yesterday's log card */}
+        <div className="last-log-wide">
+          <h3>YESTERDAY</h3>
+          {displayLog ? (
+            <>
+              <p><strong>Mood:</strong> {displayLog.mood ?? displayLog.mood}</p>
+              <p><strong>Sleep:</strong> {displayLog.hours_slept ?? displayLog.sleep} hrs</p>
+            </>
+          ) : (
+            <p>No previous log.</p>
+          )}
+        </div>
+
         <p>Mood today (1 = very low, 5 = very good)</p>
         <div className="button-group">
           {[1, 2, 3, 4, 5].map(n => (
@@ -148,15 +157,65 @@ function App() {
   };
 
   const DailyResult = () => {
-    let message = mood <= 2
-      ? "You seem a bit low today, reach out to someone."
-      : mood === 3
-      ? "Your mood is ok, do something to cheer yourself up."
-      : "Good job, keep going!";
+    const lowMood = mood <= 2;
+    const okMood = mood === 3;
+    const lowSleep = sleep <= 4;
+    const okSleep = sleep <= 6;
+
+    let moodMessage = lowMood
+      ? "Your mood is quite low today — please reach out to someone you trust."
+      : okMood
+      ? "Your mood is okay today. Try to do one small thing for yourself."
+      : "Your mood is good today, keep it up!";
+
+    let sleepMessage = lowSleep
+      ? "You've had very little sleep. Try to rest when you can and ask for help today."
+      : okSleep
+      ? "Your sleep was a little below ideal. Even a short nap can help."
+      : "You got a good amount of sleep — that makes a real difference.";
+
+    // Combined advice for worst-case scenario
+    let combinedAlert = null;
+    if (lowMood && lowSleep) {
+      combinedAlert = "Low mood and poor sleep together can feel overwhelming. Please don't face this alone — talk to someone or contact your health visitor.";
+    }
+
     return (
       <div className="container">
         <h2>Daily Summary</h2>
-        <div className="alert">{message}</div>
+
+        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+          <div style={{
+            flex: 1, borderRadius: "8px", padding: "10px", textAlign: "center",
+            background: lowMood ? "#ffb3b3" : okMood ? "#fff0a0" : "#b3f0c2"
+          }}>
+            <div style={{ fontSize: "11px", color: "#555" }}>Mood</div>
+            <div style={{ fontSize: "28px", fontWeight: "bold" }}>{mood}</div>
+            <div style={{ fontSize: "10px", color: "#555" }}>out of 5</div>
+          </div>
+          <div style={{
+            flex: 1, borderRadius: "8px", padding: "10px", textAlign: "center",
+            background: lowSleep ? "#ffb3b3" : okSleep ? "#fff0a0" : "#b3f0c2"
+          }}>
+            <div style={{ fontSize: "11px", color: "#555" }}>Sleep</div>
+            <div style={{ fontSize: "28px", fontWeight: "bold" }}>{sleep}h</div>
+            <div style={{ fontSize: "10px", color: "#555" }}>last night</div>
+          </div>
+        </div>
+
+        <div style={{ background: "#f5f3ff", borderRadius: "10px", padding: "15px", textAlign: "left", marginBottom: "12px" }}>
+          <p style={{ fontSize: "14px", color: "#444", marginBottom: "10px" }}>
+            🧠 <strong>Mood:</strong> {moodMessage}
+          </p>
+          <p style={{ fontSize: "14px", color: "#444", margin: 0 }}>
+            😴 <strong>Sleep:</strong> {sleepMessage}
+          </p>
+        </div>
+
+        {combinedAlert && (
+          <div className="alert">{combinedAlert}</div>
+        )}
+
         <button className="main-btn" onClick={() => setPage("home")}>Go Back Home</button>
       </div>
     );

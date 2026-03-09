@@ -1,5 +1,4 @@
-
-
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
 
 body {
   margin: 0;
@@ -36,10 +35,12 @@ button {
 button:hover {
   background-color: #c4b5fd;
 }
+
 button.active {
   background-color: #8b5cf6;
   color: white;
 }
+
 .main-btn {
   background-color: #8b5cf6;
   color: white;
@@ -90,10 +91,12 @@ button.active {
   padding: 30px 10px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1 / 1; /* makes them square */
+  text-align: center;
+  aspect-ratio: 1 / 1;
   transition: 0.2s ease;
 }
 
@@ -101,7 +104,6 @@ button.active {
   background-color: #d8b4fe;
   transform: translateY(-3px);
 }
-
 
 /* Home Grid */
 .home-grid {
@@ -144,7 +146,6 @@ button.active {
 }
 
 /* Last log card */
-
 .last-log-card {
   min-width: 140px;
   background: #f5f3ff;
@@ -156,20 +157,17 @@ button.active {
 }
 
 /* Tracker section */
-
 .tracker-card {
   flex: 1;
 }
 
 /* Highlight selected buttons */
-
 .button-group button.active {
   background-color: #8b5cf6;
   color: white;
 }
 
 /* Improve button groups */
-
 .button-group button {
   min-width: 36px;
   font-weight: bold;
@@ -181,14 +179,12 @@ button.active {
 }
 
 /* Section spacing */
-
 .tracker-card p {
   margin-top: 15px;
   font-weight: 500;
 }
 
 /* Yesterday Log Wide Card */
-
 .last-log-wide {
   background: #f5f3ff;
   border-radius: 12px;
@@ -206,7 +202,6 @@ button.active {
 }
 
 /* App Title */
-
 .app-title {
   width: 100%;
   font-size: 73px;
@@ -216,7 +211,6 @@ button.active {
 }
 
 /* Article page */
-
 .article {
   text-align: left;
   line-height: 1.6;
@@ -244,8 +238,4 @@ button.active {
 
 .article li {
   margin-bottom: 6px;
-}
-.article-card {
-  font-size: 14px;
-  text-align: center;
 }
