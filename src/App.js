@@ -1,5 +1,48 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import './App.css';
+
+// ---- HER VISUAL SHELL ----
+const MovingBackground = React.memo(function MovingBackground() {
+  const images = ["/bg1.jpg", "/bg2.jpg", "/bg3.jpg", "/bg4.jpg", "/bg5.jpg", "/bg6.jpg"];
+  return (
+    <div className="bg-scroll-wrap" aria-hidden="true">
+      <div className="bg-marquee">
+        {[0, 1].map((copy) => (
+          <div className="bg-scroll-track" key={copy}>
+            {images.map((src, index) => (
+              <img key={`${copy}-${index}`} src={src} alt="" />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+const PhoneOverlay = React.memo(function PhoneOverlay() {
+  return <div className="phone-overlay"></div>;
+});
+
+const AppShell = ({ children }) => (
+  <div className="app-shell">
+    <div className="phone-frame">
+      <MovingBackground />
+      <PhoneOverlay />
+      <div className="phone-content">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const BrandLogo = ({ compact = false }) => (
+  <div className={`brand-wrap ${compact ? "brand-wrap-compact" : ""}`}>
+    <div className="logo-glow"></div>
+    <img src="/after9-logo.png" className="logo no-refade" alt="After 9" />
+  </div>
+);
+// ---- END VISUAL SHELL ----
+
 
 function App() {
   // ---------- GLOBAL STATES ----------
@@ -1142,47 +1185,64 @@ function App() {
   // ---------------- LOGIN SCREEN ----------------
   if (!user) {
     return (
-      <div className="container">
-        <h1 className="app-title">AFTER 9</h1>
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
-          <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.4 }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>
-          <button className="main-btn" style={{ opacity: authMode === "register" ? 1 : 0.4 }} onClick={() => { setAuthMode("register"); setLoginError(""); }}>Register</button>
+      <AppShell>
+        <div className="container auth-screen">
+          <BrandLogo compact />
+          <div className="auth-toggle">
+            <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.45 }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>
+            <button className="main-btn" style={{ opacity: authMode === "register" ? 1 : 0.45 }} onClick={() => { setAuthMode("register"); setLoginError(""); }}>Register</button>
+          </div>
+          <p className="field-label">Username</p>
+          <input className="auth-input" placeholder="Username..." value={inputName} onChange={(e) => { setInputName(e.target.value); setLoginError(""); }} />
+          <p className="field-label">Password</p>
+          <input className="auth-input" type="password" placeholder="Password..." value={inputPassword} onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }} />
+          {loginError && <p className="error-text">{loginError}</p>}
+          <button className="main-btn" onClick={handleLogin}>
+            {authMode === "login" ? "Login" : "Create Account"}
+          </button>
         </div>
-        <p>Username</p>
-        <input placeholder="Username..." value={inputName} onChange={(e) => { setInputName(e.target.value); setLoginError(""); }} />
-        <p>Password</p>
-        <input type="password" placeholder="Password..." value={inputPassword} onChange={(e) => { setInputPassword(e.target.value); setLoginError(""); }} />
-        {loginError && <p style={{ color: "red" }}>{loginError}</p>}
-        <button className="main-btn" onClick={handleLogin}>
-          {authMode === "login" ? "Login" : "Create Account"}
-        </button>
-      </div>
+      </AppShell>
     );
   }
 
   // ---------------- PAGE ROUTING ----------------
-  if (page === "daily") return <DailyTracker />;
-  if (page === "dailyResult") return <DailyResult />;
-  if (page === "monthly") return <MonthlyCheckin />;
-  if (page === "calendar") return <CalendarPage />;
-  if (page === "support") return <SupportGroup />;
-  if (page === "emergency") return <EmergencyContacts />;
-  if (page === "info") return <Information />;
+  if (page === "daily") return <AppShell><DailyTracker /></AppShell>;
+  if (page === "dailyResult") return <AppShell><DailyResult /></AppShell>;
+  if (page === "monthly") return <AppShell><MonthlyCheckin /></AppShell>;
+  if (page === "calendar") return <AppShell><CalendarPage /></AppShell>;
+  if (page === "support") return <AppShell><SupportGroup /></AppShell>;
+  if (page === "emergency") return <AppShell><EmergencyContacts /></AppShell>;
+  if (page === "info") return <AppShell><Information /></AppShell>;
 
   // ---------------- HOME PAGE ----------------
   return (
-    <div className="container">
-      <h1>Welcome, {user}!</h1>
-      <div className="vertical-options">
-        <button className="main-btn" onClick={() => setPage("daily")}>Daily Tracker</button>
-        <button className="main-btn" onClick={() => setPage("monthly")}>Monthly Check-In</button>
-        <button className="main-btn" onClick={() => setPage("calendar")}>Calendar</button>
-        <button className="main-btn" onClick={() => setPage("support")}>Support Group</button>
-        <button className="main-btn" onClick={() => setPage("emergency")}>Emergency Contacts</button>
-        <button className="main-btn" onClick={() => setPage("info")}>Information</button>
-        <button className="main-btn" onClick={handleLogout}>Logout</button>
+    <AppShell>
+      <div className="container home-screen">
+        <BrandLogo />
+        <p className="hello-text">Hi, {user} 👋</p>
+        <div className="home-grid">
+          <div className="home-card home-card-large" onClick={() => setPage("daily")}>
+            Daily Tracker
+          </div>
+          <div className="home-card" onClick={() => setPage("monthly")}>
+            Monthly Check-In
+          </div>
+          <div className="home-card" onClick={() => setPage("calendar")}>
+            Calendar
+          </div>
+          <div className="home-card" onClick={() => setPage("support")}>
+            Support Groups
+          </div>
+          <div className="home-card" onClick={() => setPage("emergency")}>
+            Emergency Contacts
+          </div>
+          <div className="home-card home-card-large" onClick={() => setPage("info")}>
+            Information & Awareness
+          </div>
+        </div>
+        <button className="main-btn" onClick={handleLogout} style={{ marginTop: "20px" }}>Log Out</button>
       </div>
-    </div>
+    </AppShell>
   );
 }
 
