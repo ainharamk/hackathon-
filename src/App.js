@@ -529,7 +529,7 @@ function App() {
     );
   };
 
-  // ---------- SUPPORT GROUP ----------
+// ---------- SUPPORT GROUP ----------
   const SupportGroup = () => {
     const [view, setView] = useState("menu");
     const [posts, setPosts] = useState([]);
@@ -571,7 +571,7 @@ function App() {
     };
 
     const handleReplySubmit = async (postId) => {
-      if (!replyText[postId]) return;
+      if (!replyText[postId]?.trim()) return;
       try {
         const res = await fetch(`/forum/posts/${postId}/reply`, {
           method: "POST",
@@ -611,95 +611,182 @@ function App() {
       }
     };
 
+    // Avatar initials helper
+    const getInitial = (name) => (name || "?")[0].toUpperCase();
+
+    // ---------- MENU ----------
     if (view === "menu") {
       return (
         <div className="container">
-          <h2>Support Groups</h2>
-          <p>Connect with other mothers, join conversations, or seek expert advice.</p>
-          <div className="vertical-options">
-            <button className="main-btn" onClick={() => setView("new")}>New Chat</button>
-            <button className="main-btn" onClick={() => setView("existing")}>Existing Chats</button>
-            <button className="main-btn" onClick={() => setView("expert")}>Ask an Expert</button>
+          <div className="support-hero">
+            <div className="support-hero-icon">💜</div>
+            <h2>Support Groups</h2>
+            <p className="support-hero-sub">You're not alone. Connect with mothers who understand.</p>
           </div>
+
+          <div className="support-menu-grid">
+            <button className="support-menu-card" onClick={() => setView("new")}>
+              <span className="support-menu-icon">✏️</span>
+              <span className="support-menu-label">New Post</span>
+              <span className="support-menu-desc">Share something on your mind</span>
+            </button>
+            <button className="support-menu-card" onClick={() => setView("existing")}>
+              <span className="support-menu-icon">💬</span>
+              <span className="support-menu-label">Chats</span>
+              <span className="support-menu-desc">Join the conversation</span>
+            </button>
+            <button className="support-menu-card support-menu-card--expert" onClick={() => setView("expert")}>
+              <span className="support-menu-icon">🩺</span>
+              <span className="support-menu-label">Ask an Expert</span>
+              <span className="support-menu-desc">Get professional guidance</span>
+            </button>
+          </div>
+
           <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
 
+    // ---------- NEW POST ----------
     if (view === "new") {
       return (
         <div className="container">
-          <h2>Start a New Chat</h2>
+          <button className="back-link" onClick={() => setView("menu")}>← Back</button>
+          <h2>Share Something</h2>
+          <p className="support-hero-sub">This is a safe space. Say whatever's on your mind.</p>
           <textarea
-            placeholder="Write your question or share something..."
+            className="support-textarea"
+            placeholder="How are you feeling today? Ask a question, share an experience, or just vent..."
             value={newPost}
             onChange={(e) => setNewPost(e.target.value)}
-            style={{ width: "100%", minHeight: "80px", marginTop: "10px" }}
           />
-          <button className="main-btn" onClick={handlePostSubmit}>Post</button>
-          <button className="main-btn" style={{ marginTop: "20px" }} onClick={() => setView("menu")}>Back</button>
+          <button className="main-btn" style={{ width: "100%" }} onClick={handlePostSubmit}>
+            Post 💜
+          </button>
         </div>
       );
     }
 
+    // ---------- EXISTING CHATS ----------
     if (view === "existing") {
       return (
         <div className="container">
-          <h2>Existing Chats</h2>
-          {posts.length === 0 && <p>No chats available yet.</p>}
-          {posts.map(post => (
-            <div key={post.id} className="post-box" style={{ background: post.username === user ? "#e0f2fe" : "#f5f5f5", padding: "10px", borderRadius: "8px", marginBottom: "12px" }}>
-              <p><strong>{post.username}:</strong> {post.content}</p>
-              <button onClick={() => setShowReplies({ ...showReplies, [post.id]: !showReplies[post.id] })}>
-                {showReplies[post.id] ? "Hide Replies" : `Show Replies (${post.replies?.length || 0})`}
-              </button>
-              {showReplies[post.id] && (
-                <div style={{ marginTop: "10px" }}>
-                  {post.replies?.map((r, i) => (
-                    <p key={i} style={{ marginLeft: "10px" }}>↳ <strong>{r.username}:</strong> {r.content}</p>
-                  ))}
-                  <input
-                    type="text"
-                    placeholder="Reply..."
-                    value={replyText[post.id] || ""}
-                    onChange={(e) => setReplyText({ ...replyText, [post.id]: e.target.value })}
-                    style={{ width: "80%", marginRight: "8px" }}
-                  />
-                  <button className="main-btn" onClick={() => handleReplySubmit(post.id)}>Reply</button>
-                </div>
-              )}
-              {post.username === user && (
-                <button className="main-btn" style={{ marginTop: "10px", background: "#f87171" }} onClick={() => handleDeletePost(post.id)}>Delete Chat</button>
-              )}
+          <button className="back-link" onClick={() => setView("menu")}>← Back</button>
+          <h2>Community Chats</h2>
+
+          {posts.length === 0 ? (
+            <div className="support-empty">
+              <div style={{ fontSize: "40px", marginBottom: "10px" }}>🌸</div>
+              <p>No posts yet — be the first to share!</p>
+              <button className="main-btn" onClick={() => setView("new")}>Start a conversation</button>
             </div>
-          ))}
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          ) : (
+            <div className="posts-list">
+              {posts.map(post => {
+                const isOwn = post.username === user;
+                const replyCount = post.replies?.length || 0;
+                return (
+                  <div key={post.id} className={`post-card ${isOwn ? "post-card--own" : ""}`}>
+                    <div className="post-card-header">
+                      <div className="post-avatar">{getInitial(post.username)}</div>
+                      <div className="post-meta">
+                        <span className="post-username">{isOwn ? "You" : post.username}</span>
+                        {isOwn && <span className="post-own-badge">your post</span>}
+                      </div>
+                      {isOwn && (
+                        <button
+                          className="post-delete-btn"
+                          onClick={() => handleDeletePost(post.id)}
+                          title="Delete post"
+                        >✕</button>
+                      )}
+                    </div>
+
+                    <p className="post-content">{post.content}</p>
+
+                    <button
+                      className="replies-toggle"
+                      onClick={() => setShowReplies({ ...showReplies, [post.id]: !showReplies[post.id] })}
+                    >
+                      {showReplies[post.id]
+                        ? "Hide replies"
+                        : `💬 ${replyCount} ${replyCount === 1 ? "reply" : "replies"}`}
+                    </button>
+
+                    {showReplies[post.id] && (
+                      <div className="replies-section">
+                        {replyCount === 0 && (
+                          <p className="no-replies">No replies yet — be the first to respond 💜</p>
+                        )}
+                        {post.replies?.map((r, i) => (
+                          <div key={i} className={`reply-bubble ${r.username === user ? "reply-bubble--own" : ""}`}>
+                            <span className="reply-avatar">{getInitial(r.username)}</span>
+                            <div className="reply-body">
+                              <span className="reply-username">{r.username === user ? "You" : r.username}</span>
+                              <p className="reply-content">{r.content}</p>
+                            </div>
+                          </div>
+                        ))}
+
+                        <div className="reply-input-row">
+                          <input
+                            type="text"
+                            className="reply-input"
+                            placeholder="Write a reply..."
+                            value={replyText[post.id] || ""}
+                            onChange={(e) => setReplyText({ ...replyText, [post.id]: e.target.value })}
+                            onKeyDown={(e) => e.key === "Enter" && handleReplySubmit(post.id)}
+                          />
+                          <button
+                            className="reply-send-btn"
+                            onClick={() => handleReplySubmit(post.id)}
+                          >↑</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       );
     }
 
+    // ---------- ASK AN EXPERT ----------
     if (view === "expert") {
       if (expertSubmitted) {
         return (
           <div className="container">
-            <h2>Expert Question Submitted</h2>
-            <p>Your question has been sent to a qualified professional. You will be notified when they respond.</p>
-            <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+            <div className="expert-success">
+              <div style={{ fontSize: "50px", marginBottom: "12px" }}>🩺</div>
+              <h2>Question Sent!</h2>
+              <p>A qualified health professional will review your question and get back to you. You're doing the right thing by reaching out.</p>
+              <button className="main-btn" onClick={() => { setExpertSubmitted(false); setExpertMsg(""); setView("menu"); }}>
+                Back to Support
+              </button>
+            </div>
           </div>
         );
       }
+
       return (
         <div className="container">
-          <h2>Ask an Expert</h2>
-          <p>Submit your concern and a qualified health professional will respond.</p>
+          <button className="back-link" onClick={() => setView("menu")}>← Back</button>
+          <div className="expert-header">
+            <div style={{ fontSize: "36px" }}>🩺</div>
+            <h2>Ask an Expert</h2>
+            <p className="support-hero-sub">Your question goes directly to a qualified health professional. All responses are confidential.</p>
+          </div>
           <textarea
-            placeholder="Describe your concern..."
+            className="support-textarea"
+            placeholder="Describe your concern in as much detail as you feel comfortable sharing..."
             value={expertMsg}
             onChange={(e) => setExpertMsg(e.target.value)}
-            style={{ width: "100%", minHeight: "80px", marginTop: "10px" }}
           />
-          <button className="main-btn" style={{ marginTop: "15px" }} onClick={handleExpertSubmit}>Submit to Expert</button>
-          <button className="main-btn" onClick={() => setView("menu")}>Back</button>
+          <button className="main-btn" style={{ width: "100%" }} onClick={handleExpertSubmit}>
+            Send to Expert 🩺
+          </button>
         </div>
       );
     }
@@ -707,7 +794,8 @@ function App() {
     return null;
   };
 
-  // ---------- EMERGENCY CONTACTS ----------
+
+    // ---------- EMERGENCY CONTACTS ----------
   const EmergencyContacts = () => (
     <div className="container">
       <h2>Emergency Contacts</h2>

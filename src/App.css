@@ -239,3 +239,382 @@ button.active {
 .article li {
   margin-bottom: 6px;
 }
+
+
+/* ========== SUPPORT GROUP ========== */
+
+.support-hero {
+  margin-bottom: 20px;
+}
+
+.support-hero-icon {
+  font-size: 36px;
+  margin-bottom: 6px;
+}
+
+.support-hero h2 {
+  margin: 4px 0;
+}
+
+.support-hero-sub {
+  font-size: 13px;
+  color: #7c3aed;
+  margin: 4px 0 0 0;
+  opacity: 0.8;
+}
+
+/* Menu grid */
+.support-menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.support-menu-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f5f3ff;
+  border: 2px solid #ede9fe;
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  width: 100%;
+}
+
+.support-menu-card:hover {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+.support-menu-card--expert {
+  background: #fdf4ff;
+  border-color: #f0abfc;
+}
+
+.support-menu-card--expert:hover {
+  background: #fae8ff;
+  border-color: #e879f9;
+}
+
+.support-menu-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.support-menu-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #3b0764;
+  display: block;
+  line-height: 1.2;
+}
+
+.support-menu-desc {
+  font-size: 11px;
+  color: #7c3aed;
+  opacity: 0.75;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Back link */
+.back-link {
+  background: none;
+  color: #7c3aed;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+  margin: 0 0 12px 0;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+}
+
+.back-link:hover {
+  background: none;
+  color: #4c1d95;
+}
+
+/* Textarea */
+.support-textarea {
+  width: 100%;
+  min-height: 110px;
+  border: 2px solid #ede9fe;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: #3b0764;
+  resize: vertical;
+  margin: 10px 0 12px 0;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.support-textarea:focus {
+  border-color: #8b5cf6;
+}
+
+/* Empty state */
+.support-empty {
+  padding: 30px 10px;
+  color: #7c3aed;
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+/* Posts list */
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.post-card {
+  background: #fafafa;
+  border: 1.5px solid #ede9fe;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: left;
+  transition: box-shadow 0.15s;
+}
+
+.post-card:hover {
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.1);
+}
+
+.post-card--own {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+
+.post-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.post-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #c084fc);
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.post-meta {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.post-username {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4c1d95;
+}
+
+.post-own-badge {
+  font-size: 10px;
+  background: #ddd6fe;
+  color: #6d28d9;
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-weight: 600;
+}
+
+.post-delete-btn {
+  background: none;
+  color: #f87171;
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin: 0;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.post-delete-btn:hover {
+  background: #fee2e2;
+  opacity: 1;
+}
+
+.post-content {
+  font-size: 14px;
+  color: #374151;
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.replies-toggle {
+  background: none;
+  color: #7c3aed;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 0;
+  margin: 0;
+  border-bottom: 1px dashed #ddd6fe;
+  border-radius: 0;
+  width: 100%;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.replies-toggle:hover {
+  background: none;
+  color: #4c1d95;
+}
+
+/* Replies section */
+.replies-section {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.no-replies {
+  font-size: 12px;
+  color: #9ca3af;
+  font-style: italic;
+  margin: 0;
+}
+
+.reply-bubble {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.reply-bubble--own {
+  flex-direction: row-reverse;
+}
+
+.reply-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c084fc, #f0abfc);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.reply-body {
+  background: #f3e8ff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  max-width: 80%;
+}
+
+.reply-bubble--own .reply-body {
+  background: #ede9fe;
+}
+
+.reply-username {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6d28d9;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.reply-content {
+  font-size: 13px;
+  color: #374151;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Reply input */
+.reply-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.reply-input {
+  flex: 1;
+  border: 1.5px solid #ddd6fe;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  color: #3b0764;
+}
+
+.reply-input:focus {
+  border-color: #8b5cf6;
+}
+
+.reply-send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.reply-send-btn:hover {
+  background: #7c3aed;
+}
+
+/* Expert section */
+.expert-header {
+  margin-bottom: 12px;
+}
+
+.expert-header h2 {
+  margin: 6px 0 4px 0;
+}
+
+.expert-success {
+  padding: 20px 10px;
+  color: #4c1d95;
+}
+
+.expert-success h2 {
+  margin: 8px 0;
+}
+
+.expert-success p {
+  font-size: 14px;
+  color: #6d28d9;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
