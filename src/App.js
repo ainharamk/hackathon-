@@ -30,6 +30,12 @@ function App() {
 
         localStorage.setItem("dailyLog", JSON.stringify(log));
         setLastLog(log);
+
+        const key = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
+        const allLogs = JSON.parse(localStorage.getItem("allLogs") || "{}");
+        allLogs[key] = { mood, sleep };
+        localStorage.setItem("allLogs", JSON.stringify(allLogs));
+
         setPage("dailyResult");
       };
 
@@ -93,6 +99,299 @@ function App() {
       </div>
     );
   }
+
+  // ---------- CALENDAR PAGE ----------
+const CalendarPage = () => {
+  const today = new Date();
+  const [view, setView] = useState("calendar");
+  const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+
+  const logs = (() => {
+    const saved = localStorage.getItem("allLogs");
+    return saved ? JSON.parse(saved) : {};
+  })();
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const monthName = viewDate.toLocaleString("default", { month: "long" });
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+
+  const getMoodColor = (mood) => {
+    if (!mood) return "#f3e8ff";
+    if (mood <= 2) return "#ffb3b3";
+    if (mood === 3) return "#fff0a0";
+    return "#b3f0c2";
+  };
+
+  // --- GRAPH DATA ---
+  const moodData = Array.from({ length: daysInMonth }, (_, i) => {
+    const key = `${year}-${month + 1}-${i + 1}`;
+    return logs[key]?.mood ?? null;
+  });
+
+  const sleepData = Array.from({ length: daysInMonth }, (_, i) => {
+    const key = `${year}-${month + 1}-${i + 1}`;
+    return logs[key]?.sleep ?? null;
+  });
+
+  const gW = 320, gH = 150, padL = 24, padB = 20, padT = 10, padR = 10;
+  const innerW = gW - padL - padR;
+  const innerH = gH - padT - padB;
+
+  const toX = (i) => padL + (i / (daysInMonth - 1)) * innerW;
+  const toYMood = (v) => padT + innerH - ((v - 1) / 4) * innerH;
+  const toYSleep = (v) => padT + innerH - ((v - 1) / 7) * innerH;
+
+  const buildPath = (data, toY) => {
+    const points = data
+      .map((v, i) => v !== null ? `${toX(i)},${toY(v)}` : null)
+      .filter(Boolean);
+    return points.length > 1 ? "M " + points.join(" L ") : "";
+  };
+
+  const moodPath = buildPath(moodData, toYMood);
+  const sleepPath = buildPath(sleepData, toYSleep);
+
+  // --- TOGGLE BUTTONS ---
+  const Toggle = () => (
+    <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "15px" }}>
+      <button
+        onClick={() => setView("calendar")}
+        style={{
+          padding: "8px 20px",
+          borderRadius: "20px",
+          border: "none",
+          background: view === "calendar" ? "#8b5cf6" : "#e9d5ff",
+          color: view === "calendar" ? "white" : "#8b5cf6",
+          fontWeight: "bold",
+          cursor: "pointer"
+        }}
+      >
+        Calendar
+      </button>
+      <button
+        onClick={() => setView("graph")}
+        style={{
+          padding: "8px 20px",
+          borderRadius: "20px",
+          border: "none",
+          background: view === "graph" ? "#8b5cf6" : "#e9d5ff",
+          color: view === "graph" ? "white" : "#8b5cf6",
+          fontWeight: "bold",
+          cursor: "pointer"
+        }}
+      >
+        Graph
+      </button>
+      <button
+        onClick={() => setView("summary")}
+        style={{
+          padding: "8px 20px",
+          borderRadius: "20px",
+          border: "none",
+          background: view === "summary" ? "#8b5cf6" : "#e9d5ff",
+          color: view === "summary" ? "white" : "#8b5cf6",
+          fontWeight: "bold",
+          cursor: "pointer"
+        }}
+      >
+        Summary
+      </button>
+    </div>
+  );
+
+    // --- CALENDAR VIEW ---
+    if (view === "calendar") {
+      const blanks = Array(firstDay).fill(null);
+      const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+      return (
+        <div className="container">
+          <h2>Mood Calendar</h2>
+          <Toggle />
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+            <button className="main-btn" style={{ marginTop: 0 }} onClick={prevMonth}>← Prev</button>
+            <strong>{monthName} {year}</strong>
+            <button className="main-btn" style={{ marginTop: 0 }} onClick={nextMonth}>Next →</button>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", textAlign: "center" }}>
+            {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
+              <div key={d} style={{ fontWeight: "bold", fontSize: "11px", padding: "4px", color: "#8b5cf6" }}>{d}</div>
+            ))}
+            {blanks.map((_, i) => <div key={"b"+i} />)}
+            {days.map(day => {
+              const key = `${year}-${month+1}-${day}`;
+              const log = logs[key];
+              const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+              return (
+                <div key={day} style={{
+                  background: getMoodColor(log?.mood),
+                  borderRadius: "6px",
+                  padding: "5px 2px",
+                  fontSize: "12px",
+                  border: isToday ? "2px solid #8b5cf6" : "2px solid transparent"
+                }}>
+                  <div style={{ fontWeight: isToday ? "bold" : "normal" }}>{day}</div>
+                  {log && <div style={{ fontSize: "9px", color: "#555" }}>😴{log.sleep}h</div>}
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ marginTop: "15px", fontSize: "12px", display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap" }}>
+            <span style={{ background: "#b3f0c2", padding: "2px 8px", borderRadius: "4px" }}>Good</span>
+            <span style={{ background: "#fff0a0", padding: "2px 8px", borderRadius: "4px" }}>OK</span>
+            <span style={{ background: "#ffb3b3", padding: "2px 8px", borderRadius: "4px" }}>Low</span>
+            <span style={{ background: "#f3e8ff", padding: "2px 8px", borderRadius: "4px" }}>No data</span>
+          </div>
+
+          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+        </div>
+      );
+    }
+
+    // --- GRAPH VIEW ---
+    if (view === "graph") {
+      return (
+        <div className="container">
+          <h2>Mood Graph</h2>
+          <Toggle />
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+            <button className="main-btn" style={{ marginTop: 0 }} onClick={prevMonth}>← Prev</button>
+            <strong>{monthName} {year}</strong>
+            <button className="main-btn" style={{ marginTop: 0 }} onClick={nextMonth}>Next →</button>
+          </div>
+
+          {/* MOOD GRAPH */}
+          <p style={{ fontWeight: "bold", marginBottom: "4px", textAlign: "left" }}>Mood (1–5)</p>
+          <svg width={gW} height={gH} style={{ overflow: "visible" }}>
+            {/* Grid lines */}
+            {[1,2,3,4,5].map(v => (
+              <g key={v}>
+                <line x1={padL} x2={gW - padR} y1={toYMood(v)} y2={toYMood(v)} stroke="#e9d5ff" strokeWidth="1" />
+                <text x={padL - 4} y={toYMood(v) + 4} fontSize="10" textAnchor="end" fill="#999">{v}</text>
+              </g>
+            ))}
+            {/* Mood line */}
+            {moodPath && <path d={moodPath} fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinejoin="round" />}
+            {/* Dots */}
+            {moodData.map((v, i) => v !== null && (
+              <circle key={i} cx={toX(i)} cy={toYMood(v)} r="4" fill="#8b5cf6" />
+            ))}
+            {/* X axis */}
+            <line x1={padL} x2={gW - padR} y1={padT + innerH} y2={padT + innerH} stroke="#ccc" strokeWidth="1" />
+          </svg>
+
+          {/* SLEEP GRAPH */}
+          <p style={{ fontWeight: "bold", marginBottom: "4px", marginTop: "20px", textAlign: "left" }}>Sleep (hrs)</p>
+          <svg width={gW} height={gH} style={{ overflow: "visible" }}>
+            {[2,4,6,8].map(v => (
+              <g key={v}>
+                <line x1={padL} x2={gW - padR} y1={toYSleep(v)} y2={toYSleep(v)} stroke="#e9d5ff" strokeWidth="1" />
+                <text x={padL - 4} y={toYSleep(v) + 4} fontSize="10" textAnchor="end" fill="#999">{v}</text>
+              </g>
+            ))}
+            {sleepPath && <path d={sleepPath} fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinejoin="round" />}
+            {sleepData.map((v, i) => v !== null && (
+              <circle key={i} cx={toX(i)} cy={toYSleep(v)} r="4" fill="#34d399" />
+            ))}
+            <line x1={padL} x2={gW - padR} y1={padT + innerH} y2={padT + innerH} stroke="#ccc" strokeWidth="1" />
+          </svg>
+
+          <div style={{ fontSize: "12px", display: "flex", gap: "15px", justifyContent: "center", marginTop: "10px" }}>
+            <span><span style={{ color: "#8b5cf6", fontWeight: "bold" }}>●</span> Mood</span>
+            <span><span style={{ color: "#34d399", fontWeight: "bold" }}>●</span> Sleep</span>
+          </div>
+
+          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+        </div>
+      );
+    }
+    // --- SUMMARY VIEW ---
+if (view === "summary") {
+  const monthEntries = Object.entries(logs).filter(([key]) =>
+    key.startsWith(`${year}-${month + 1}-`)
+  );
+
+  const avgMood = monthEntries.length
+    ? (monthEntries.reduce((sum, [, v]) => sum + v.mood, 0) / monthEntries.length).toFixed(1)
+    : null;
+
+  const avgSleep = monthEntries.length
+    ? (monthEntries.reduce((sum, [, v]) => sum + v.sleep, 0) / monthEntries.length).toFixed(1)
+    : null;
+
+  const moodAdvice =
+    !avgMood ? "No data yet." :
+    avgMood <= 2 ? "Your mood has been quite low this month. Consider reaching out to someone you trust or speaking to a professional." :
+    avgMood <= 3 ? "Your mood has been average this month. Try to carve out some time for yourself each day." :
+    "Your mood has been good this month. Keep up whatever is working for you!";
+
+  const sleepAdvice =
+    !avgSleep ? "No data yet." :
+    avgSleep <= 4 ? "You've been getting very little sleep. Try to rest when your baby rests and ask for help where possible." :
+    avgSleep <= 6 ? "Your sleep has been below the recommended amount. Even short naps can help with recovery." :
+    "You're getting a decent amount of sleep. Keep prioritising rest.";
+
+  const moodColor = !avgMood ? "#f3e8ff" : avgMood <= 2 ? "#ffb3b3" : avgMood <= 3 ? "#fff0a0" : "#b3f0c2";
+  const sleepColor = !avgSleep ? "#f3e8ff" : avgSleep <= 4 ? "#ffb3b3" : avgSleep <= 6 ? "#fff0a0" : "#b3f0c2";
+
+  return (
+    <div className="container">
+      <h2>Monthly Summary</h2>
+      <Toggle />
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+        <button className="main-btn" style={{ marginTop: 0 }} onClick={prevMonth}>← Prev</button>
+        <strong>{monthName} {year}</strong>
+        <button className="main-btn" style={{ marginTop: 0 }} onClick={nextMonth}>Next →</button>
+      </div>
+
+      {monthEntries.length === 0 ? (
+        <p style={{ color: "#999", fontSize: "14px" }}>No data logged for this month yet.</p>
+      ) : (
+        <>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+            <div style={{ flex: 1, background: moodColor, borderRadius: "8px", padding: "10px", textAlign: "center" }}>
+              <div style={{ fontSize: "11px", color: "#555" }}>Avg Mood</div>
+              <div style={{ fontSize: "26px", fontWeight: "bold" }}>{avgMood}</div>
+              <div style={{ fontSize: "10px", color: "#555" }}>out of 5</div>
+            </div>
+            <div style={{ flex: 1, background: sleepColor, borderRadius: "8px", padding: "10px", textAlign: "center" }}>
+              <div style={{ fontSize: "11px", color: "#555" }}>Avg Sleep</div>
+              <div style={{ fontSize: "26px", fontWeight: "bold" }}>{avgSleep}</div>
+              <div style={{ fontSize: "10px", color: "#555" }}>hours</div>
+            </div>
+            <div style={{ flex: 1, background: "#e9d5ff", borderRadius: "8px", padding: "10px", textAlign: "center" }}>
+              <div style={{ fontSize: "11px", color: "#555" }}>Days Logged</div>
+              <div style={{ fontSize: "26px", fontWeight: "bold" }}>{monthEntries.length}</div>
+              <div style={{ fontSize: "10px", color: "#555" }}>this month</div>
+            </div>
+          </div>
+
+          <div style={{ background: "#f5f3ff", borderRadius: "10px", padding: "15px", textAlign: "left" }}>
+            <p style={{ fontSize: "14px", color: "#444", marginBottom: "12px" }}>
+              🧠 <strong>Mood:</strong> {moodAdvice}
+            </p>
+            <p style={{ fontSize: "14px", color: "#444", margin: 0 }}>
+              😴 <strong>Sleep:</strong> {sleepAdvice}
+            </p>
+          </div>
+        </>
+      )}
+
+      <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+    </div>
+  );
+}
+  };
     // ---------- DAILY RESULT ----------
     const DailyResult = () => {
       let message = "";
@@ -725,7 +1024,7 @@ const Information = () => {
     if (page === "support") return <SupportGroup />;
     if (page === "emergency") return <EmergencyContacts />;
     if (page === "info") return <Information />;
-
+    if (page === "calendar") return <CalendarPage />;
 
 
 
@@ -772,6 +1071,9 @@ const Information = () => {
         >
           Information & Awareness
         </div>
+      <div className="home-card" onClick={() => setPage("calendar")}>
+        Mood Calendar
+      </div>
 
       </div>
       </div>
