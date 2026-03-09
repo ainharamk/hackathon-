@@ -583,7 +583,7 @@ button {
   }
 }
 /* ===================================================
-   SUPPORT GROUP — merged from dev branch
+   SUPPORT GROUP — merged from old branch
    Uses warm beige palette to match app shell
    =================================================== */
 
@@ -965,7 +965,7 @@ button {
 }
 
 /* ===================================================
-   ARTICLE / INFORMATION — merged from dev branch
+   ARTICLE / INFORMATION — merged from old branch
    Adapted to warm beige palette
    =================================================== */
 
@@ -1176,4 +1176,68 @@ button {
   font-weight: 600;
   color: #4a7a55;
   margin-bottom: 6px;
+}
+
+
+/* Back link */
+.back-link {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #8a6f5a !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 0 0 12px 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  display: block !important;
+  text-align: left !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+.back-link:hover {
+  color: #3f3732 !important;
+  background: none !important;
+  transform: none !important;
+}
+
+/* Last log card */
+.last-log-wide {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border: 1.5px solid rgba(120, 95, 70, 0.12) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  margin-bottom: 8px !important;
+  text-align: center !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.last-log-wide h3 {
+  margin: 0 0 6px 0 !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+  color: #8a6f5a !important;
+  text-transform: uppercase !important;
+}
+
+/* Main btn spacing to prevent collisions */
+.main-btn + .main-btn {
+  margin-top: 10px;
+}
+
+/* Option buttons active state  */
+.option-btn.active {
+  background: linear-gradient(135deg, #c9a889, #b88f6e) !important;
+  color: white !important;
+  border-color: transparent !important;
+}
+
+/* Summary stat boxes */
+.stat-card {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
 }

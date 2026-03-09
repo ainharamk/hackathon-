@@ -168,33 +168,34 @@ function App() {
       <div className="container">
         <h2>Daily Tracker</h2>
 
-        {/* Yesterday's log card */}
         <div className="last-log-wide">
           <h3>YESTERDAY</h3>
           {displayLog ? (
-            <>
-              <p><strong>Mood:</strong> {displayLog.mood}</p>
-              <p><strong>Sleep:</strong> {displayLog.hours_slept != null ? displayLog.hours_slept : displayLog.sleep} hrs</p>
-            </>
+            <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginTop: "6px" }}>
+              <div><div style={{ fontSize: "11px", color: "#8a6f5a" }}>Mood</div><div style={{ fontSize: "22px", fontWeight: "700", color: "#3f3732" }}>{displayLog.mood}</div></div>
+              <div><div style={{ fontSize: "11px", color: "#8a6f5a" }}>Sleep</div><div style={{ fontSize: "22px", fontWeight: "700", color: "#3f3732" }}>{displayLog.hours_slept != null ? displayLog.hours_slept : displayLog.sleep}h</div></div>
+            </div>
           ) : (
-            <p>No previous log.</p>
+            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#8a6f5a" }}>No previous log.</p>
           )}
         </div>
 
-        <p>Mood today (1 = very low, 5 = very good)</p>
+        <p style={{ marginTop: "20px", marginBottom: "6px" }}>Mood today (1 = very low, 5 = very good)</p>
         <div className="button-group">
           {[1, 2, 3, 4, 5].map(n => (
             <button key={n} className={localMood === n ? "active" : ""} onClick={() => setLocalMood(n)}>{n}</button>
           ))}
         </div>
-        <p>Hours of sleep last night</p>
+        <p style={{ marginTop: "16px", marginBottom: "6px" }}>Hours of sleep last night</p>
         <div className="button-group">
           {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
             <button key={n} className={localSleep === n ? "active" : ""} onClick={() => setLocalSleep(n)}>{n}</button>
           ))}
         </div>
-        <button className="main-btn" onClick={handleSubmit}>Submit</button>
-        <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
+          <button className="main-btn" onClick={handleSubmit}>Submit</button>
+          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+        </div>
       </div>
     );
   };
@@ -230,7 +231,7 @@ function App() {
         <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
           <div style={{
             flex: 1, borderRadius: "8px", padding: "10px", textAlign: "center",
-            background: lowMood ? "#ffb3b3" : okMood ? "#fff0a0" : "#b3f0c2"
+            background: lowMood ? "#f5c4c4" : okMood ? "#f5e6b0" : "#b8dfc0"
           }}>
             <div style={{ fontSize: "11px", color: "#555" }}>Mood</div>
             <div style={{ fontSize: "28px", fontWeight: "bold" }}>{mood}</div>
@@ -238,7 +239,7 @@ function App() {
           </div>
           <div style={{
             flex: 1, borderRadius: "8px", padding: "10px", textAlign: "center",
-            background: lowSleep ? "#ffb3b3" : okSleep ? "#fff0a0" : "#b3f0c2"
+            background: lowSleep ? "#f5c4c4" : okSleep ? "#f5e6b0" : "#b8dfc0"
           }}>
             <div style={{ fontSize: "11px", color: "#555" }}>Sleep</div>
             <div style={{ fontSize: "28px", fontWeight: "bold" }}>{sleep}h</div>
@@ -246,11 +247,11 @@ function App() {
           </div>
         </div>
 
-        <div style={{ background: "#f5f3ff", borderRadius: "10px", padding: "15px", textAlign: "left", marginBottom: "12px" }}>
-          <p style={{ fontSize: "14px", color: "#444", marginBottom: "10px" }}>
+        <div style={{ background: "rgba(255,255,255,0.3)", backdropFilter: "blur(8px)", borderRadius: "14px", padding: "15px", textAlign: "left", marginBottom: "12px", border: "1.5px solid rgba(120,95,70,0.1)" }}>
+          <p style={{ fontSize: "14px", color: "#4b4038", marginBottom: "10px" }}>
             🧠 <strong>Mood:</strong> {moodMessage}
           </p>
-          <p style={{ fontSize: "14px", color: "#444", margin: 0 }}>
+          <p style={{ fontSize: "14px", color: "#4b4038", margin: 0 }}>
             😴 <strong>Sleep:</strong> {sleepMessage}
           </p>
         </div>
@@ -285,7 +286,7 @@ function App() {
     const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
 
     const getMoodColor = (mood) => {
-      if (!mood) return "#f3e8ff";
+      if (!mood) return "rgba(255,255,255,0.35)";
       if (mood <= 2) return "#ffb3b3";
       if (mood === 3) return "#fff0a0";
       return "#b3f0c2";
@@ -320,20 +321,23 @@ function App() {
     const sleepPath = buildPath(sleepData, toYSleep);
 
     const Toggle = () => (
-      <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "15px" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "15px" }}>
         {["calendar", "graph", "summary"].map(v => (
           <button
             key={v}
             onClick={() => setView(v)}
             style={{
-              padding: "8px 20px",
-              borderRadius: "20px",
+              padding: "8px 18px",
+              borderRadius: "999px",
               border: "none",
-              background: view === v ? "#8b5cf6" : "#e9d5ff",
-              color: view === v ? "white" : "#8b5cf6",
-              fontWeight: "bold",
+              background: view === v ? "linear-gradient(135deg, #c9a889, #b88f6e)" : "rgba(255,255,255,0.3)",
+              color: view === v ? "white" : "#7a6555",
+              fontWeight: "700",
               cursor: "pointer",
-              textTransform: "capitalize"
+              textTransform: "capitalize",
+              backdropFilter: "blur(8px)",
+              boxShadow: view === v ? "0 4px 12px rgba(140,107,82,0.2)" : "none",
+              fontSize: "13px"
             }}
           >
             {v === "calendar" ? "Calendar" : v === "graph" ? "Graph" : "Summary"}
@@ -360,7 +364,7 @@ function App() {
           <NavRow />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", textAlign: "center" }}>
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
-              <div key={d} style={{ fontWeight: "bold", fontSize: "11px", padding: "4px", color: "#8b5cf6" }}>{d}</div>
+              <div key={d} style={{ fontWeight: "bold", fontSize: "11px", padding: "4px", color: "#8a6f5a" }}>{d}</div>
             ))}
             {blanks.map((_, i) => <div key={"b" + i} />)}
             {days.map(day => {
@@ -373,7 +377,7 @@ function App() {
                   borderRadius: "6px",
                   padding: "5px 2px",
                   fontSize: "12px",
-                  border: isToday ? "2px solid #8b5cf6" : "2px solid transparent"
+                  border: isToday ? "2px solid #b88f6e" : "2px solid transparent"
                 }}>
                   <div style={{ fontWeight: isToday ? "bold" : "normal" }}>{day}</div>
                   {log && <div style={{ fontSize: "9px", color: "#555" }}>😴{log.sleep}h</div>}
@@ -382,10 +386,10 @@ function App() {
             })}
           </div>
           <div style={{ marginTop: "15px", fontSize: "12px", display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap" }}>
-            <span style={{ background: "#b3f0c2", padding: "2px 8px", borderRadius: "4px" }}>Good</span>
-            <span style={{ background: "#fff0a0", padding: "2px 8px", borderRadius: "4px" }}>OK</span>
-            <span style={{ background: "#ffb3b3", padding: "2px 8px", borderRadius: "4px" }}>Low</span>
-            <span style={{ background: "#f3e8ff", padding: "2px 8px", borderRadius: "4px" }}>No data</span>
+            <span style={{ background: "#b8dfc0", padding: "2px 8px", borderRadius: "4px", fontSize: "11px" }}>Good</span>
+            <span style={{ background: "#f5e6b0", padding: "2px 8px", borderRadius: "4px", fontSize: "11px" }}>OK</span>
+            <span style={{ background: "#f5c4c4", padding: "2px 8px", borderRadius: "4px", fontSize: "11px" }}>Low</span>
+            <span style={{ background: "rgba(255,255,255,0.4)", padding: "2px 8px", borderRadius: "4px", fontSize: "11px", border: "1px solid rgba(120,95,70,0.15)" }}>No data</span>
           </div>
           <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
         </div>
@@ -402,11 +406,11 @@ function App() {
           <svg width={gW} height={gH} style={{ overflow: "visible" }}>
             {[1, 2, 3, 4, 5].map(v => (
               <g key={v}>
-                <line x1={padL} x2={gW - padR} y1={toYMood(v)} y2={toYMood(v)} stroke="#e9d5ff" strokeWidth="1" />
+                <line x1={padL} x2={gW - padR} y1={toYMood(v)} y2={toYMood(v)} stroke="rgba(120,95,70,0.15)" strokeWidth="1" />
                 <text x={padL - 4} y={toYMood(v) + 4} fontSize="10" textAnchor="end" fill="#999">{v}</text>
               </g>
             ))}
-            {moodPath && <path d={moodPath} fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinejoin="round" />}
+            {moodPath && <path d={moodPath} fill="none" stroke="#c9a889" strokeWidth="2.5" strokeLinejoin="round" />}
             {moodData.map((v, i) => v !== null && (
               <circle key={i} cx={toX(i)} cy={toYMood(v)} r="4" fill="#8b5cf6" />
             ))}
@@ -416,7 +420,7 @@ function App() {
           <svg width={gW} height={gH} style={{ overflow: "visible" }}>
             {[2, 4, 6, 8].map(v => (
               <g key={v}>
-                <line x1={padL} x2={gW - padR} y1={toYSleep(v)} y2={toYSleep(v)} stroke="#e9d5ff" strokeWidth="1" />
+                <line x1={padL} x2={gW - padR} y1={toYSleep(v)} y2={toYSleep(v)} stroke="rgba(120,95,70,0.15)" strokeWidth="1" />
                 <text x={padL - 4} y={toYSleep(v) + 4} fontSize="10" textAnchor="end" fill="#999">{v}</text>
               </g>
             ))}
@@ -427,7 +431,7 @@ function App() {
             <line x1={padL} x2={gW - padR} y1={padT + innerH} y2={padT + innerH} stroke="#ccc" strokeWidth="1" />
           </svg>
           <div style={{ fontSize: "12px", display: "flex", gap: "15px", justifyContent: "center", marginTop: "10px" }}>
-            <span><span style={{ color: "#8b5cf6", fontWeight: "bold" }}>●</span> Mood</span>
+            <span><span style={{ color: "#c9a889", fontWeight: "bold" }}>●</span> Mood</span>
             <span><span style={{ color: "#34d399", fontWeight: "bold" }}>●</span> Sleep</span>
           </div>
           <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
@@ -453,8 +457,8 @@ function App() {
         : avgSleep <= 4 ? "You've been getting very little sleep. Try to rest when your baby rests and ask for help where possible."
         : avgSleep <= 6 ? "Your sleep has been below the recommended amount. Even short naps can help with recovery."
         : "You're getting a decent amount of sleep. Keep prioritising rest.";
-      const moodColor = !avgMood ? "#f3e8ff" : avgMood <= 2 ? "#ffb3b3" : avgMood <= 3 ? "#fff0a0" : "#b3f0c2";
-      const sleepColor = !avgSleep ? "#f3e8ff" : avgSleep <= 4 ? "#ffb3b3" : avgSleep <= 6 ? "#fff0a0" : "#b3f0c2";
+      const moodColor = !avgMood ? "#f3e8ff" : avgMood <= 2 ? "#f5c4c4" : avgMood <= 3 ? "#f5e6b0" : "#b8dfc0";
+      const sleepColor = !avgSleep ? "#f3e8ff" : avgSleep <= 4 ? "#f5c4c4" : avgSleep <= 6 ? "#f5e6b0" : "#b8dfc0";
 
       return (
         <div className="container">
@@ -528,21 +532,31 @@ function App() {
     if (submitted) {
       return (
         <div className="container">
-          <h2>Monthly Check-In Submitted</h2>
-          <p>Your responses have been recorded.</p>
-          <div className="alert">
-            If you are experiencing persistent low mood or thoughts of self-harm,
-            please seek professional support immediately.
+          <div className="support-hero">
+            <div className="support-hero-icon">✅</div>
+            <h2>Check-In Complete</h2>
+            <p className="support-hero-sub">Thank you for taking the time to check in with yourself.</p>
           </div>
-          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+          <div className="article-callout alert-red" style={{ marginTop: "16px" }}>
+            🚨 If you are experiencing persistent low mood or thoughts of self-harm, please seek professional support immediately or visit the Emergency Contacts page.
+          </div>
+          <button className="main-btn" style={{ marginTop: "16px", width: "100%" }} onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
 
     return (
       <div className="container">
-        <h2>Monthly Mental Health Check-In</h2>
-        <p>{questions[currentQuestion].question}</p>
+        <div className="support-hero" style={{ marginBottom: "10px" }}>
+          <div className="support-hero-icon">🧠</div>
+          <h2>Monthly Check-In</h2>
+          <p className="support-hero-sub">Question {currentQuestion + 1} of {questions.length}</p>
+        </div>
+
+        <div style={{ background: "rgba(255,255,255,0.28)", borderRadius: "14px", padding: "14px 16px", marginBottom: "14px", border: "1.5px solid rgba(120,95,70,0.1)", backdropFilter: "blur(8px)" }}>
+          <p style={{ margin: 0, fontSize: "14px", color: "#3f3732", lineHeight: "1.5" }}>{questions[currentQuestion].question}</p>
+        </div>
+
         <div className="vertical-options">
           {questions[currentQuestion].options.map((option, index) => (
             <button
@@ -554,18 +568,17 @@ function App() {
             </button>
           ))}
         </div>
-        <div style={{ marginTop: "20px" }}>
-          {currentQuestion === 0 && (
-            <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+
+        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+          {currentQuestion === 0 ? (
+            <button className="main-btn" style={{ flex: 1 }} onClick={() => setPage("home")}>← Home</button>
+          ) : (
+            <button className="main-btn" style={{ flex: 1 }} onClick={() => setCurrentQuestion(currentQuestion - 1)}>← Prev</button>
           )}
-          {currentQuestion > 0 && (
-            <button className="main-btn" onClick={() => setCurrentQuestion(currentQuestion - 1)}>Previous</button>
-          )}
-          {currentQuestion < questions.length - 1 && (
-            <button className="main-btn" onClick={() => setCurrentQuestion(currentQuestion + 1)}>Next</button>
-          )}
-          {currentQuestion === questions.length - 1 && (
-            <button className="main-btn" onClick={() => setSubmitted(true)}>Submit</button>
+          {currentQuestion < questions.length - 1 ? (
+            <button className="main-btn" style={{ flex: 1 }} onClick={() => setCurrentQuestion(currentQuestion + 1)}>Next →</button>
+          ) : (
+            <button className="main-btn" style={{ flex: 1 }} onClick={() => setSubmitted(true)}>Submit ✓</button>
           )}
         </div>
       </div>
@@ -841,19 +854,42 @@ function App() {
     // ---------- EMERGENCY CONTACTS ----------
   const EmergencyContacts = () => (
     <div className="container">
-      <h2>Emergency Contacts</h2>
-      <p>
-        This page provides immediate access to support services.
-        If you are feeling unsafe, overwhelmed, or experiencing thoughts
-        of self-harm, please use one of the options below.
-      </p>
-      <div className="vertical-options">
-        <button className="main-btn">Call Emergency Contact</button>
-        <button className="main-btn">Call Postpartum Helpline</button>
-        <button className="main-btn">Request Health Visitor</button>
-        <button className="main-btn">Call Emergency Services</button>
+      <div className="support-hero">
+        <div className="support-hero-icon">🚨</div>
+        <h2>Emergency Contacts</h2>
+        <p className="support-hero-sub">If you are feeling unsafe or overwhelmed, you are not alone. Help is available right now.</p>
       </div>
-      <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+      <div className="support-menu-grid">
+        <button className="support-menu-card" onClick={() => window.location.href = "tel:"}>
+          <span className="support-menu-icon">👤</span>
+          <div>
+            <span className="support-menu-label">Call Emergency Contact</span>
+            <span className="support-menu-desc">Reach someone you trust</span>
+          </div>
+        </button>
+        <button className="support-menu-card" onClick={() => window.location.href = "tel:08081961776"}>
+          <span className="support-menu-icon">💜</span>
+          <div>
+            <span className="support-menu-label">PANDAS Helpline</span>
+            <span className="support-menu-desc">0808 196 1776 · 11am–10pm daily</span>
+          </div>
+        </button>
+        <button className="support-menu-card" onClick={() => window.location.href = "tel:"}>
+          <span className="support-menu-icon">🩺</span>
+          <div>
+            <span className="support-menu-label">Request Health Visitor</span>
+            <span className="support-menu-desc">Contact your local service</span>
+          </div>
+        </button>
+        <button className="support-menu-card support-menu-card--expert" onClick={() => window.location.href = "tel:999"}>
+          <span className="support-menu-icon">🚑</span>
+          <div>
+            <span className="support-menu-label">Call 999</span>
+            <span className="support-menu-desc">Emergency services — immediate danger</span>
+          </div>
+        </button>
+      </div>
+      <button className="main-btn" style={{ marginTop: "10px" }} onClick={() => setPage("home")}>Back to Home</button>
     </div>
   );
 
@@ -888,7 +924,7 @@ function App() {
       return (
         <div className="container">
           <h2>Information & Awareness</h2>
-          <p style={{ fontSize: "13px", color: "#6d28d9", marginBottom: "16px" }}>
+          <p style={{ fontSize: "13px", color: "#7a6555", marginBottom: "16px" }}>
             Trusted resources from the NHS, WHO, and leading health organisations.
           </p>
           <div className="article-grid">
