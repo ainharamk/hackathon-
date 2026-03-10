@@ -185,21 +185,33 @@ The goal is to ensure **help is always immediately accessible if a user is in di
 
 # 📸 Application Screenshots
 
-Login Screen
-<img width="468" height="564" alt="image" src="https://github.com/user-attachments/assets/502c8c20-6b93-4f71-88e2-10637f22125d" />
+---
 
+### 🔐 Login Screen &nbsp;&nbsp;&nbsp; 📊 Mood Tracker
 
-Mood Tracker
-<img width="401" height="489" alt="image" src="https://github.com/user-attachments/assets/b7adb458-372f-4477-a91b-abe6a0dcb62c" />
+<p float="left">
+  <img width="380" alt="Login Screen" src="https://github.com/user-attachments/assets/502c8c20-6b93-4f71-88e2-10637f22125d" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img width="380" alt="Mood Tracker" src="https://github.com/user-attachments/assets/b7adb458-372f-4477-a91b-abe6a0dcb62c" />
+</p>
 
+---
 
-Community Forum
-<img width="416" height="416" alt="image" src="https://github.com/user-attachments/assets/c1ca2b9c-0ee4-455a-9b36-fdb6e9486ea4" /> <img width="414" height="804" alt="image" src="https://github.com/user-attachments/assets/0ffe7770-8dea-41e5-b396-2c342276eb7d" />
+### 💬 Community Forum
 
+<p float="left">
+  <img width="380" alt="Community Forum" src="https://github.com/user-attachments/assets/c1ca2b9c-0ee4-455a-9b36-fdb6e9486ea4" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img width="380" alt="Community Forum Thread" src="https://github.com/user-attachments/assets/0ffe7770-8dea-41e5-b396-2c342276eb7d" />
+</p>
 
-Monthly Summary Dashboard
-<img width="419" height="490" alt="image" src="https://github.com/user-attachments/assets/7460823f-4554-4c92-a38f-f5b44b11495d" />
+---
 
+### 📅 Monthly Summary Dashboard
+
+<p>
+  <img width="380" alt="Monthly Summary Dashboard" src="https://github.com/user-attachments/assets/7460823f-4554-4c92-a38f-f5b44b11495d" />
+</p>
 
 ---
 
