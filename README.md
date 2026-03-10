@@ -1,70 +1,323 @@
-# Getting Started with Create React App
+# After9 💜
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web platform designed to support mothers experiencing **Postnatal Depression (PND)** through mood tracking, peer support, and mental health resources.
 
-## Available Scripts
+Built during a hackathon, **After9** combines community support, wellbeing tracking, and educational resources into a simple mobile-style interface designed to feel supportive and accessible during difficult moments.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+# 🌍 Live Deployment
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The application is deployed using Railway.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Application (Frontend + Backend)
 
-### `npm test`
+https://hackathon-production-a0f1.up.railway.app
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+GitHub Repository
 
-### `npm run build`
+https://github.com/ainharamk/hackathon-
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The web application and database are hosted through Railway, allowing the frontend interface and backend API to run from the same deployment.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# 📊 Project Architecture
 
-### `npm run eject`
+The project follows a **full-stack architecture**.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+React Frontend
+      │
+      │ REST API Requests
+      ▼
+Express.js Backend
+      │
+      │ SQL Queries
+      ▼
+MySQL Database
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+All services are deployed using Railway.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# 🧠 Features
 
-## Learn More
+## 🔐 User Authentication
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Users can create accounts and securely log in.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Security features include:
 
-### Code Splitting
+* Password hashing using **bcrypt**
+* Username uniqueness validation
+* Backend authentication verification
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+API routes
 
-### Analyzing the Bundle Size
+```
+POST /users/register
+POST /users/login
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+# 📅 Daily Mood & Sleep Tracker
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Users can track their daily wellbeing by logging:
 
-### Advanced Configuration
+* Mood (1–5 scale)
+* Hours of sleep
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+This information is stored in the **daily_tracker** table.
 
-### Deployment
+API routes
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```
+POST /tracker
+GET /tracker?username=example
+```
 
-### `npm run build` fails to minify
+The backend returns the **most recent entry for the user**, allowing the interface to display their latest wellbeing update.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Future Improvements
+
+Future versions of the tracker could include:
+
+* Calculating **average mood scores**
+* Weekly and monthly wellbeing summaries
+* Mood trend visualisations
+* Pattern detection for sleep and emotional health
+
+These features would help users better understand long-term wellbeing patterns.
+
+---
+
+# 💬 Community Support Forum
+
+The platform includes a **community support forum** where users can connect with others experiencing similar challenges.
+
+Users can:
+
+* Create posts
+* Reply to posts
+* Post anonymously
+* Delete their own posts
+
+API routes
+
+```
+GET /forum/posts
+POST /forum/posts
+POST /forum/posts/:id/reply
+DELETE /forum/posts/:id
+```
+
+### Anonymous Posting System
+
+Users can choose to post anonymously.
+
+When this happens:
+
+* The displayed username becomes **"Anonymous"**
+* The **real username is still securely stored in the database**
+
+This design allows important safety features in future updates, including:
+
+* Reporting harassment
+* Moderator review of harmful posts
+* Removing abusive content
+* Identifying concerning posts such as suicidal messages
+
+Storing the real username also ensures the **original poster can still delete their own post**, even when it appears anonymous to other users.
+
+This approach balances **privacy with safety and accountability**.
+
+---
+
+# 👩‍⚕️ Ask an Expert
+
+Users can submit questions to professionals through the **Ask an Expert** feature.
+
+Currently these questions are stored as special forum posts marked as expert enquiries.
+
+API route
+
+```
+POST /forum/experts
+```
+
+Example stored format
+
+```
+[EXPERT QUESTION] message text
+```
+
+### Future Improvements
+
+In future versions this feature could become a **secure enquiry system**, where:
+
+* Only **verified or hired professionals** can access expert questions
+* Professionals can respond directly to users
+* Conversations can function similarly to **support tickets**
+* Responses can be moderated to ensure reliable medical guidance
+
+This would allow the platform to connect users with **qualified mental health professionals**.
+
+---
+
+# 🚑 Emergency Support Access
+
+Emergency resources are always visible in the **top-right corner of the application**.
+
+This ensures users can quickly access help without needing to navigate through menus.
+
+Available resources include:
+
+* Emergency services
+* Mental health helplines
+* Support organisations
+
+The goal is to ensure **help is always immediately accessible if a user is in distress**.
+
+---
+
+# 📸 Application Screenshots
+
+Login Screen
+Insert login screen image here
+
+Mood Tracker
+Insert mood tracker image here
+
+Community Forum
+Insert forum image here
+
+Monthly Summary Dashboard
+Insert dashboard image here
+
+---
+
+# 🛠 Tech Stack
+
+Frontend
+
+* React
+* JavaScript
+* CSS
+
+Backend
+
+* Node.js
+* Express.js
+
+Database
+
+* MySQL
+
+Security
+
+* bcrypt password hashing
+
+Deployment
+
+* Railway
+
+Development Tools
+
+* Git
+* GitHub
+* npm
+
+---
+
+# 🗄 Database Structure
+
+### users
+
+```
+id
+username
+password
+```
+
+### daily_tracker
+
+```
+id
+username
+mood
+hours_slept
+created_at
+```
+
+### forum_posts
+
+```
+id
+username
+real_username
+message
+created_by_user
+created_at
+```
+
+### forum_replies
+
+```
+id
+post_id
+username
+message
+created_at
+```
+
+---
+
+# 🚀 Future Roadmap
+
+Planned improvements for After9 include:
+
+* AI-powered mood pattern detection
+* Weekly and monthly wellbeing insights
+* Professional mental health expert dashboard
+* Secure expert enquiry system
+* Real-time community chat
+* Push notifications for wellbeing reminders
+* Mobile application version
+* Moderation tools for harmful posts
+* Crisis detection alerts for concerning messages
+
+The long-term goal is to evolve After9 into a **complete digital support platform for maternal mental health**.
+
+---
+
+# 👥 Hackathon Project Team
+
+This project was developed collaboratively during a hackathon focused on **digital mental health solutions**. Team members contributed across different areas including frontend design, backend development, database structure, and deployment.
+
+**Adnan**
+Worked mainly on backend development for the daily mood tracker, implementing the logic for recording and retrieving mood and sleep data. He also helped improve and adapt the SQL database structure to support the tracker functionality and ensure the stored data worked effectively with the backend API.
+
+**Ainhara**
+Played a major role in the frontend design and overall presentation of the platform. This included developing much of the website’s CSS styling, choosing colour schemes, selecting imagery, and organising informational resources and articles related to postnatal depression. She also helped shape the overall UI and user experience to make the platform approachable and supportive.
+
+**Dhruvesh**
+Originally proposed the idea for the project and contributed significantly to backend development. He helped design the SQL database structure and played an important role in building the community support group system, including the structure for posts and replies that allows users to share experiences and support one another.
+
+**Justin**
+Worked on backend development and deployment, including hosting the SQL database and application using Railway. Also helped integrate the project by merging features from separate development branches and ensuring the different components worked together correctly.
+
+**Zakariya**
+Worked extensively on frontend functionality, including implementing the login interface and authentication interactions. He also contributed multiple improvements to the user interface such as button behaviour, layout adjustments, and other interaction logic to improve usability.
+
+The project was developed collaboratively with team members contributing across both frontend and backend areas throughout the hackathon.
+
+---
+
+# ⚠️ Disclaimer
+
+After9 is designed to **support mental wellbeing**, not replace professional medical advice.
+
+If you or someone you know is experiencing severe distress or thoughts of self-harm, please contact emergency services or a qualified healthcare professional immediately.
