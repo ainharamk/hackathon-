@@ -186,16 +186,20 @@ The goal is to ensure **help is always immediately accessible if a user is in di
 # 📸 Application Screenshots
 
 Login Screen
-Insert login screen image here
+<img width="468" height="564" alt="image" src="https://github.com/user-attachments/assets/502c8c20-6b93-4f71-88e2-10637f22125d" />
+
 
 Mood Tracker
-Insert mood tracker image here
+<img width="401" height="489" alt="image" src="https://github.com/user-attachments/assets/b7adb458-372f-4477-a91b-abe6a0dcb62c" />
+
 
 Community Forum
-Insert forum image here
+<img width="416" height="416" alt="image" src="https://github.com/user-attachments/assets/c1ca2b9c-0ee4-455a-9b36-fdb6e9486ea4" /> <img width="414" height="804" alt="image" src="https://github.com/user-attachments/assets/0ffe7770-8dea-41e5-b396-2c342276eb7d" />
+
 
 Monthly Summary Dashboard
-Insert dashboard image here
+<img width="419" height="490" alt="image" src="https://github.com/user-attachments/assets/7460823f-4554-4c92-a38f-f5b44b11495d" />
+
 
 ---
 
@@ -295,7 +299,7 @@ The long-term goal is to evolve After9 into a **complete digital support platfor
 
 # 👥 Hackathon Project Team
 
-This project was developed collaboratively during a hackathon focused on **digital mental health solutions**. Team members contributed across different areas including frontend design, backend development, database structure, and deployment.
+This project was developed collaboratively during a hackathon focused on **innovative technology that improves the lives of women.**. Team members contributed across different areas including frontend design, backend development, database structure, and deployment.
 
 **Adnan**
 Worked mainly on backend development for the daily mood tracker, implementing the logic for recording and retrieving mood and sleep data. He also helped improve and adapt the SQL database structure to support the tracker functionality and ensure the stored data worked effectively with the backend API.
