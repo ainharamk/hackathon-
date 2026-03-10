@@ -120,7 +120,6 @@ function App() {
       try {
         const response = await fetch(`/tracker?username=${encodeURIComponent(user)}`);
         const logs = await response.json();
-        // Server returns mood as Number and filters by user already
         if (logs.length > 0) setLastLog(logs[0]);
         else setLastLog(null);
       } catch (err) {
@@ -166,7 +165,6 @@ function App() {
       }
     };
 
-    // Use server lastLog if available, otherwise fall back to localStorage
     const displayLog = lastLog || localLastLog;
 
     return (
@@ -232,7 +230,6 @@ function App() {
       ? "Your sleep was a little below ideal. Even a short nap can help."
       : "You got a good amount of sleep — that makes a real difference.";
 
-    // Combined advice for worst-case scenario
     let combinedAlert = null;
     if (lowMood && lowSleep) {
       combinedAlert = "Low mood and poor sleep together can feel overwhelming. Please don't face this alone — talk to someone or contact your health visitor.";
@@ -696,10 +693,8 @@ function App() {
       }
     };
 
-    // Avatar initials helper
     const getInitial = (name) => (name || "?")[0].toUpperCase();
 
-    // ---------- MENU ----------
     if (view === "menu") {
       return (
         <div className="container">
@@ -732,7 +727,6 @@ function App() {
       );
     }
 
-    // ---------- NEW POST ----------
     if (view === "new") {
       return (
         <div className="container">
@@ -764,7 +758,6 @@ function App() {
       );
     }
 
-    // ---------- EXISTING CHATS ----------
     if (view === "existing") {
       return (
         <div className="container">
@@ -855,7 +848,6 @@ function App() {
       );
     }
 
-    // ---------- ASK AN EXPERT ----------
     if (view === "expert") {
       if (expertSubmitted) {
         return (
@@ -1278,12 +1270,25 @@ function App() {
         <div className="container auth-screen">
           <BrandLogo />
           <p style={{ fontSize: "13px", color: "#8a6f5a", margin: "0 0 20px 0", textAlign: "center", lineHeight: "1.5" }}>
-            A safe space for mothers, by mothers.
+            A safe space where mothers support mothers.
           </p>
-          <div className="auth-toggle">
-            <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.4, minWidth: "110px" }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>
-            <button className="main-btn" style={{ opacity: authMode === "register" ? 1 : 0.4, minWidth: "110px" }} onClick={() => { setAuthMode("register"); setLoginError(""); }}>Register</button>
+
+          {/* ── SLIDER TOGGLE ── */}
+          <div className="auth-toggle-slider">
+            <div
+              className="auth-slider-pill"
+              style={{ transform: authMode === "register" ? "translateX(100%)" : "translateX(0%)" }}
+            />
+            <button
+              className={`auth-slider-btn ${authMode === "login" ? "active" : ""}`}
+              onClick={() => { setAuthMode("login"); setLoginError(""); }}
+            >Login</button>
+            <button
+              className={`auth-slider-btn ${authMode === "register" ? "active" : ""}`}
+              onClick={() => { setAuthMode("register"); setLoginError(""); }}
+            >Register</button>
           </div>
+
           <div style={{ width: "100%", maxWidth: "280px", margin: "0 auto" }}>
             <p className="field-label" style={{ textAlign: "left", fontSize: "12px", color: "#8a6f5a", fontWeight: "600", marginBottom: "4px" }}>Username</p>
             <input className="auth-input" style={{ width: "100%", marginBottom: "12px" }} placeholder="Enter your username..." value={inputName} onChange={(e) => { setInputName(e.target.value); setLoginError(""); }} />
