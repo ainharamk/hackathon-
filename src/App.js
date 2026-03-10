@@ -595,14 +595,14 @@ function App() {
 
         <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
           {currentQuestion === 0 ? (
-            <button className="main-btn" style={{ flex: 1 }} onClick={() => setPage("home")}>← Home</button>
+            <button className="main-btn" style={{ flex: 1, width: 0 }} onClick={() => setPage("home")}>← Home</button>
           ) : (
-            <button className="main-btn" style={{ flex: 1 }} onClick={() => setCurrentQuestion(currentQuestion - 1)}>← Prev</button>
+            <button className="main-btn" style={{ flex: 1, width: 0 }} onClick={() => setCurrentQuestion(currentQuestion - 1)}>← Prev</button>
           )}
           {currentQuestion < questions.length - 1 ? (
-            <button className="main-btn" style={{ flex: 1 }} onClick={() => setCurrentQuestion(currentQuestion + 1)}>Next →</button>
+            <button className="main-btn" style={{ flex: 1, width: 0 }} onClick={() => setCurrentQuestion(currentQuestion + 1)}>Next →</button>
           ) : (
-            <button className="main-btn" style={{ flex: 1 }} onClick={() => setSubmitted(true)}>Submit ✓</button>
+            <button className="main-btn" style={{ flex: 1, width: 0 }} onClick={() => setSubmitted(true)}>Submit ✓</button>
           )}
         </div>
       </div>
@@ -982,7 +982,8 @@ function App() {
               </div>
             ))}
           </div>
-          <button className="main-btn" onClick={() => setPage("home")}>Back to Home</button>
+          <div style={{ height: "20px" }} />
+          <button className="main-btn" style={{ width: "100%" }} onClick={() => setPage("home")}>Back to Home</button>
         </div>
       );
     }
@@ -1277,7 +1278,7 @@ function App() {
         <div className="container auth-screen">
           <BrandLogo />
           <p style={{ fontSize: "13px", color: "#8a6f5a", margin: "0 0 20px 0", textAlign: "center", lineHeight: "1.5" }}>
-            A safe space where mothers support mothers.
+            A safe space for mothers, by mothers.
           </p>
           <div className="auth-toggle">
             <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.4, minWidth: "110px" }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>

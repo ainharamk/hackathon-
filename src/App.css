@@ -110,7 +110,7 @@ body {
 .container {
   width: 100%;
   min-height: 100%;
-  padding: 22px 18px 24px;
+  padding: 22px 18px 48px;
   text-align: center;
   position: relative;
   z-index: 2;
