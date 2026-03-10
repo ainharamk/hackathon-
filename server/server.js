@@ -121,7 +121,25 @@ app.get("/tracker", (req, res) => {
     [username],
     (err, results) => {
       if (err) return res.status(500).send("Database error");
-      // mood stored as varchar — parse to number so frontend comparisons work
+      const parsed = results.map(r => ({ ...r, mood: Number(r.mood) }));
+      res.json(parsed);
+    }
+  );
+});
+
+// Returns ALL logs for the given user — used to populate calendar/graph/summary
+app.get("/tracker/all", (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).send("username query param required");
+  }
+
+  db.query(
+    "SELECT * FROM daily_tracker WHERE username = ? ORDER BY created_at DESC, id DESC",
+    [username],
+    (err, results) => {
+      if (err) return res.status(500).send("Database error");
       const parsed = results.map(r => ({ ...r, mood: Number(r.mood) }));
       res.json(parsed);
     }
@@ -133,15 +151,12 @@ app.post("/forum/posts", (req, res) => {
   const { username, content, anonymous } = req.body;
   if (!username || !content) return res.status(400).send("Missing fields");
 
-  // real_username always stores the actual user so they can delete their own posts
-  // display username is "Anonymous" if the user ticked the box
   const displayName = anonymous ? "Anonymous" : username;
 
   const sql =
     "INSERT INTO forum_posts (username, message, created_by_user, real_username) VALUES (?, ?, true, ?)";
   db.query(sql, [displayName, content, username], (err, result) => {
     if (err) {
-      // If real_username column doesn't exist yet, fall back gracefully
       const fallbackSql =
         "INSERT INTO forum_posts (username, message, created_by_user) VALUES (?, ?, true)";
       db.query(fallbackSql, [displayName, content], (err2, result2) => {
@@ -155,7 +170,6 @@ app.post("/forum/posts", (req, res) => {
 });
 
 app.get("/forum/posts", (req, res) => {
-  // Use a subquery instead of JSON_ARRAYAGG to avoid null/empty JSON parse issues
   const sql = `
     SELECT p.id, p.username, p.message AS content, COALESCE(p.real_username, p.username) AS real_username
     FROM forum_posts p
@@ -177,7 +191,6 @@ app.get("/forum/posts", (req, res) => {
     db.query(replySql, [postIds], (err, replies) => {
       if (err) return res.status(500).send("Database error");
 
-      // Group replies by post_id safely — no JSON.parse needed
       const replyMap = {};
       (replies || []).forEach(r => {
         if (!replyMap[r.post_id]) replyMap[r.post_id] = [];
@@ -211,7 +224,6 @@ app.post("/forum/posts/:id/reply", (req, res) => {
 
 app.delete("/forum/posts/:id", (req, res) => {
   const { username } = req.body;
-  // Allow delete if real_username matches or fall back to username match
   const sql = "DELETE FROM forum_posts WHERE id = ? AND (COALESCE(real_username, username) = ? OR username = ?)";
   db.query(sql, [req.params.id, username, username], (err) => {
     if (err) return res.status(500).send("Database error");
@@ -220,7 +232,6 @@ app.delete("/forum/posts/:id", (req, res) => {
 });
 
 // ---------- EXPERT QUESTIONS ----------
-// Stored as a forum post flagged with created_by_user = false
 app.post("/forum/experts", (req, res) => {
   const { username, content } = req.body;
   if (!username || !content) return res.status(400).send("Missing fields");

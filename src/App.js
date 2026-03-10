@@ -113,21 +113,37 @@ function App() {
     setUser(null);
   };
 
-  // ---------------- LOAD LAST LOG ----------------
+  // ---------------- LOAD LAST LOG + SYNC ALL LOGS ----------------
   useEffect(() => {
     if (!user) return;
-    const loadLastLog = async () => {
+    const loadLogs = async () => {
       try {
-        const response = await fetch(`/tracker?username=${encodeURIComponent(user)}`);
+        const response = await fetch(`/tracker/all?username=${encodeURIComponent(user)}`);
         const logs = await response.json();
-        if (logs.length > 0) setLastLog(logs[0]);
-        else setLastLog(null);
+
+        if (logs.length > 0) {
+          setLastLog(logs[0]);
+
+          // Sync all server logs into localStorage so calendar/graph/summary work
+          const allLogs = {};
+          logs.forEach(log => {
+            const d = new Date(log.created_at);
+            const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+            allLogs[key] = {
+              mood: Number(log.mood),
+              sleep: Number(log.hours_slept)
+            };
+          });
+          localStorage.setItem(`${user}_allLogs`, JSON.stringify(allLogs));
+        } else {
+          setLastLog(null);
+        }
       } catch (err) {
         console.error(err);
         setLastLog(null);
       }
     };
-    loadLastLog();
+    loadLogs();
   }, [user]);
 
   // ================== CHILD COMPONENTS ==================
