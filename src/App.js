@@ -239,7 +239,6 @@ function App() {
     }
 
     const moodEmoji = lowMood ? "😔" : okMood ? "😐" : "😊";
-    const sleepEmoji = lowSleep ? "😩" : okSleep ? "😴" : "🌙";
     const moodLabel = lowMood ? "Low" : okMood ? "Okay" : "Good";
     const sleepLabel = lowSleep ? "Very Low" : okSleep ? "Below Ideal" : "Good";
 
@@ -1278,7 +1277,7 @@ function App() {
         <div className="container auth-screen">
           <BrandLogo />
           <p style={{ fontSize: "13px", color: "#8a6f5a", margin: "0 0 20px 0", textAlign: "center", lineHeight: "1.5" }}>
-            A safe space for mothers, by mothers.
+            A safe space where mothers support mothers.
           </p>
           <div className="auth-toggle">
             <button className="main-btn" style={{ opacity: authMode === "login" ? 1 : 0.4, minWidth: "110px" }} onClick={() => { setAuthMode("login"); setLoginError(""); }}>Login</button>
