@@ -1275,6 +1275,9 @@ const Information = () => {
             Mood tracker
           </div>
         </div>
+      <div className="home-card" onClick={() => setPage("calendar")}>
+        Mood Calendar
+      </div>
 
         <button className="main-btn" onClick={handleLogout} style={{ marginTop: "20px" }}>
           Log Out
